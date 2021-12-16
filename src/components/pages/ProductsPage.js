@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ProductsTable from "../tables/ProductsTable"
 import ProductService from "../../services/ProductService";
+import Header from "./Header";
 
 class ProductsPage extends Component {
 
@@ -20,7 +21,9 @@ class ProductsPage extends Component {
     }
 
     render() {
-        return (<div> <ProductsTable products={this.state.products} /> </div>);
+        return (<div> 
+            <Header />
+            <ProductsTable products={this.state.products} /> </div>);
     }
 };
 
