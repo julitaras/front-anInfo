@@ -1,24 +1,23 @@
 import React, {Component} from "react"
 import logo from '../../logo.svg';
+import Nav from "react-bootstrap/Nav";
 
 class HomePage extends Component {
 
     render() {
         return (<div className="App">
           <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
+            <h1> PSA </h1>
+              <img src={logo} className="App-logo" alt="logo" />
             <p>
-              Edit <code>src/App.js</code> and save to reload.
+              Bienvenido al sitio web de PSA.
             </p>
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
           </header>
+            <Nav className="me-auto nav-fill ">
+                <Nav.Link href="/products">Modulo Soporte</Nav.Link>
+                <Nav.Link href="/projects">Modulo Proyectos</Nav.Link>
+                <Nav.Link href="/hours">Modulo Recursos</Nav.Link>
+            </Nav>
           </div>);
     }
 }
