@@ -51,10 +51,10 @@ class Header extends Component {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
-                    <Nav.Link href="/">Home</Nav.Link>
-                    <Nav.Link href="/">Soporte</Nav.Link>
-                    <Nav.Link href="/">Proyectos</Nav.Link>
-                    <Nav.Link href="/">Recursos</Nav.Link>
+                    <Nav.Link href="/home">Home</Nav.Link>
+                    <Nav.Link href="/products">Soporte</Nav.Link>
+                    <Nav.Link href="/projects">Proyectos</Nav.Link>
+                    <Nav.Link href="/hours">Recursos</Nav.Link>
                     
                 </Nav>
                 </Navbar.Collapse>
