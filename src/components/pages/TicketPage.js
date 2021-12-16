@@ -38,7 +38,7 @@ class TicketPage extends Component {
     }
       
     peticionPost=async()=>{
-        delete this.state.form.id;
+        //delete this.state.form.ticketID;
         await axios.post('http://soporte-fiuba.herokuapp.com/tickets',this.state.form).then(response=>{
             this.modalInsertar();
             this.peticionGet();
@@ -48,13 +48,13 @@ class TicketPage extends Component {
     }
       
     peticionPut=()=>{
-        axios.put('http://soporte-fiuba.herokuapp.com/tickets'+this.state.form.id, this.state.form).then(response=>{
+        axios.put('http://soporte-fiuba.herokuapp.com/tickets'+this.state.form.ticketID, this.state.form).then(response=>{
         this.peticionGet();
         })
     }
       
     peticionDelete=()=>{
-        axios.delete('http://soporte-fiuba.herokuapp.com/tickets'+this.state.form.id).then(response=>{
+        axios.delete('http://soporte-fiuba.herokuapp.com/tickets'+this.state.form.ticketID).then(response=>{
             this.setState({modalEliminar: false});
             this.peticionGet();
         })
