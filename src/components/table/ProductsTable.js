@@ -4,6 +4,9 @@ import {Table} from "reactstrap"
 import {Link} from "react-router-dom"
 
 class ProductsTable extends Component {
+    
+    // USAR STATE EN EL LINK PUEDE SER CAUSA DE BUG SI SE ACTUALIZA LA URL
+    // DE UTLIMA MODIFICAR PARA QUE SE PASE TODO POR PARAM Y YA
 
     render() {
         const table =
@@ -26,10 +29,11 @@ class ProductsTable extends Component {
                                     </td>
                                     <td>{product.versions[0]}</td>
                                     <td><Link
-                                        to={`/ticket/${product.name}/${product.versions[0]}`}
+                                        to={`/ticket/${product.name}/${product.versions[0]}/create`}
                                         state={{ productID: product.id }}>Crear Ticket</Link>
                                     </td>
-                                    <td><Link to={`/ticket/${product.id}`}>Ver tickets</Link></td>
+                                    <td><Link to={`/ticket/${product.name}/${product.versions[0]}/query`}
+                                        state={{ productID: product.id }}>Ver tickets</Link></td>
                                 </tr>
 
                                 {product.versions.map((version, index) => {
@@ -38,10 +42,11 @@ class ProductsTable extends Component {
                                             <tr key={index}>
                                                 <td>{version}</td>
                                                 <td><Link
-                                                    to={`/ticket/${product.name}/${version}`}
+                                                    to={`/ticket/${product.name}/${version}/create`}
                                                     state={{ productID: product.id }}>Crear Ticket</Link>
                                                 </td>
-                                                <td><Link to={`/ticket/${product.id}`}>Ver tickets</Link></td>
+                                                <td><Link to={`/ticket/${product.name}/${version}/query`}
+                                                    state={{ productID: product.id }}>Ver tickets</Link></td>
                                             </tr>);
                                     }
                                 })}

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ProductsTable from "../table/ProductsTable"
 import ProductService from "../../service/ProductService";
-import Header from "./Header";
+import Header from "../Header";
 
 class ProductsPage extends Component {
 
@@ -17,7 +17,8 @@ class ProductsPage extends Component {
         productService.getProducts().then(response =>
             this.setState({
                 products: response
-            }));
+            })
+        );
     }
 
     render() {

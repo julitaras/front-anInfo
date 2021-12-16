@@ -1,4 +1,9 @@
-import React, {Component} from "react";
+import React, {Component} from "react"
+import {compose} from "redux";
+import withParams from "../../hoc/withParams";
+import withLocation from "../../hoc/withLocation"
+import Product from "../model/Product";
+
 import {
     Button,
     Form,
@@ -7,7 +12,7 @@ import {
     Label
   } from 'reactstrap';
 
-class TicketForm extends Component {
+class TicketPage extends Component {
 
     constructor(props) {
         super(props);
@@ -18,7 +23,19 @@ class TicketForm extends Component {
          * */
         // TENGO EN props.state EL ID DEL PRODUCTO UN CAMBIO DE PAGINA
         // PUEDE HACER QUE SE ROMPA SI NO SETEO props.state NUEVAMENTE
+        this.state = { 
+            product: new Product()
+        };
         this.postTicket = this.postTicket.bind(this);
+    }
+
+    componentDidMount() {
+        console.log(this.props);
+        const productID = this.props.location.state.productID;
+        const {name, version} = this.props.params;
+        this.setState({
+            product: Product.createProduct(productID, name, version)
+        });
     }
 
     postTicket(e) {
@@ -27,12 +44,21 @@ class TicketForm extends Component {
     }
 
     render() {
+        /* NOTA: 
+         * PRIMERO SE RENDERIZA EL FORMULARIO LUEGO SE EJECUTA 
+         * COMPONENT_DID_MOUNT Y POR ULTIMO SE VUELVE A RENDERIZAR
+         * POR ESO SE GENERAN 6 LLAMADOS AL LOG CON 3 INDEFINIDOS Y 
+         * 3 DEFINIDIOS ... 
+         * */
+        //console.log(this.state.product.getProductID());
+        //console.log(this.state.product.getName());
+        //console.log(this.state.product.getVersion());
 
         return (
             <div className="TicketForm">
-                <h2>Carga de Ticket
+                <h2>Crear ticket
                     <small><small><small>
-                        {` (${this.props.product.name} v${this.props.product.version})`}
+                        {` (${this.state.product.name} v${this.state.product.version})`}
                     </small></small></small>
                 </h2>
                 <Form className="form" onSubmit={(e) => this.postTicket(e)}>
@@ -91,4 +117,7 @@ class TicketForm extends Component {
     }
 }
 
-export default TicketForm;
+export default compose(
+    withParams,
+    withLocation
+)(TicketPage)

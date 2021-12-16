@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import logo from "../../static/logo.png";
+import logo from "../static/logo.png";
 import Nav from 'react-bootstrap/Nav';
 import Image from 'react-bootstrap/Image';
 import { Navbar, Container, NavDropdown, Breadcrumb } from "react-bootstrap";
