@@ -3,11 +3,6 @@ import logo from '../../logo.svg';
 
 class HomePage extends Component {
 
-    constructor(props) {
-        super(props);
-        console.log(props);
-    }
-
     render() {
         return (<div className="App">
           <header className="App-header">

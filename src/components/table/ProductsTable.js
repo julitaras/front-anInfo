@@ -5,12 +5,8 @@ import {Link} from "react-router-dom"
 
 class ProductsTable extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        let table =
+        const table =
             <div className="ProductsTable"
                 style={{ display: 'block', padding: 30 }}>
                 <Table striped bordered hover>
@@ -29,7 +25,10 @@ class ProductsTable extends Component {
                                         {product.name}
                                     </td>
                                     <td>{product.versions[0]}</td>
-                                    <td><Link to="/ticket">Crear Ticket</Link></td>
+                                    <td><Link
+                                        to={`/ticket/${product.name}/${product.versions[0]}`}
+                                        state={{ productID: product.id }}>Crear Ticket</Link>
+                                    </td>
                                     <td><Link to={`/ticket/${product.id}`}>Ver tickets</Link></td>
                                 </tr>
 
@@ -38,7 +37,10 @@ class ProductsTable extends Component {
                                         return (
                                             <tr key={index}>
                                                 <td>{version}</td>
-                                                <td><Link to="/ticket">Crear Ticket</Link></td>
+                                                <td><Link
+                                                    to={`/ticket/${product.name}/${version}`}
+                                                    state={{ productID: product.id }}>Crear Ticket</Link>
+                                                </td>
                                                 <td><Link to={`/ticket/${product.id}`}>Ver tickets</Link></td>
                                             </tr>);
                                     }
@@ -52,6 +54,7 @@ class ProductsTable extends Component {
             <div className="ProductList">
                 {table}
             </div>
+
         );
     }
 }
