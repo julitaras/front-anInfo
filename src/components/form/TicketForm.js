@@ -11,6 +11,7 @@ import {
     Input,
     Label
   } from 'reactstrap';
+import Header from "../Header";
 
 class TicketPage extends Component {
 
@@ -55,6 +56,8 @@ class TicketPage extends Component {
         //console.log(this.state.product.getVersion());
 
         return (
+            <div>
+            <Header {...this.props} />
             <div className="TicketForm">
                 <h2>Crear ticket
                     <small><small><small>
@@ -112,6 +115,7 @@ class TicketPage extends Component {
                     <Button>Crear Ticket</Button>
                     {/*<Input type="reset"> </Input>*/}
                 </Form>
+            </div>
             </div>
         );
     }

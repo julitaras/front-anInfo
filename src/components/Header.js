@@ -2,12 +2,44 @@ import React, { Component } from "react";
 import logo from "../static/logo.png";
 import Nav from 'react-bootstrap/Nav';
 import Image from 'react-bootstrap/Image';
-import { Navbar, Container, NavDropdown, Breadcrumb } from "react-bootstrap";
+import { Navbar, Container, Breadcrumb } from "react-bootstrap";
+import {BreadcrumbItem} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import routes from "../routes";
 
 class Header extends Component {
 
     constructor(props) {
         super(props);
+        console.log(props);
+        const crumbs = routes
+                // Get all routes that contain the current one.
+                .filter(({ path }) => props.location.pathname.includes(path))
+                // Swap out any dynamic routes with their param values.
+                // E.g. "/pizza/:pizzaId" will become "/pizza/1"
+                .map(({ path, ...rest }) => ({
+                  path: Object.keys(props.params).length
+                    ? Object.keys(props.params).reduce(
+                        (path, param) =>
+                          path.replace(`:${param}`, props.params[param]),
+                        path
+                      )
+                    : path,
+                  ...rest
+                }));
+        console.log('Generated crumbs for ${props.match.path}');
+        crumbs.map(({ name, path }) => console.log({ name, path }));
+        // Given an array of objects which contain a `name` and `path` property,
+        // generate a `BreadcrumbItem` component for each.
+        this.crumbs_items = crumbs.map(({ name, path }, index) => (
+            path === props.location.pathname ?
+            <BreadcrumbItem key={index} active>{name}</BreadcrumbItem> :
+            <BreadcrumbItem key={index}>
+                <Link to={path}>{name}</Link>
+            </BreadcrumbItem>
+        ));
+
+        
     }
 
     render() {
@@ -29,13 +61,9 @@ class Header extends Component {
                 
             </Container>
             </Navbar>
-            <Breadcrumb>
-            <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-            <Breadcrumb.Item href="https://getbootstrap.com/docs/4.0/components/breadcrumb/">
-              Library
-            </Breadcrumb.Item>
-            <Breadcrumb.Item active>Data</Breadcrumb.Item>
-          </Breadcrumb>
+                <Breadcrumb>
+                    {this.crumbs_items}
+            </Breadcrumb>
           </Container>
           );
     }
