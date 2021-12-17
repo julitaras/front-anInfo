@@ -2,7 +2,7 @@ import React, {Component} from "react"
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation"
-import Product from "../model/Product";
+import ClientService from "../../service/ClientService";
 
 import {
     Button,
@@ -13,30 +13,37 @@ import {
   } from 'reactstrap';
 import Header from "../Header";
 
-class TicketPage extends Component {
+class TicketForm extends Component {
 
     constructor(props) {
         super(props);
-        /* NOTA: 
-         * OJO CON TRATAR DE USAR PROPS PASADOS
-         * DE UN COMPONENTE PADRE EN EL CONSTRUCTOR
-         * PUEDE DAR UN OBJETO INDEFINIDO
-         * */
-        // TENGO EN props.state EL ID DEL PRODUCTO UN CAMBIO DE PAGINA
-        // PUEDE HACER QUE SE ROMPA SI NO SETEO props.state NUEVAMENTE
-        this.state = { 
-            product: new Product()
+        this.state = {
+            productID: " ",
+            productName: " ",
+            productVersion: " ",
+            clients: []
         };
-        this.postTicket = this.postTicket.bind(this);
+        //this.postTicket = this.postTicket.bind(this);
+    }
+
+    _setClientsState() {
+        const clientService = new ClientService();
+        clientService.getClients().then(response => {
+            this.setState( {
+                clients: response
+            })
+        });
     }
 
     componentDidMount() {
-        console.log(this.props);
         const productID = this.props.location.state.productID;
         const {name, version} = this.props.params;
         this.setState({
-            product: Product.createProduct(productID, name, version)
+            productID: productID,
+            productName: name,
+            productVersion: version,
         });
+        this._setClientsState();
     }
 
     postTicket(e) {
@@ -45,23 +52,14 @@ class TicketPage extends Component {
     }
 
     render() {
-        /* NOTA: 
-         * PRIMERO SE RENDERIZA EL FORMULARIO LUEGO SE EJECUTA 
-         * COMPONENT_DID_MOUNT Y POR ULTIMO SE VUELVE A RENDERIZAR
-         * POR ESO SE GENERAN 6 LLAMADOS AL LOG CON 3 INDEFINIDOS Y 
-         * 3 DEFINIDIOS ... 
-         * */
-        //console.log(this.state.product.getProductID());
-        //console.log(this.state.product.getName());
-        //console.log(this.state.product.getVersion());
-
+        console.log(this.state.clients);
         return (
             <div>
             <Header {...this.props} />
             <div className="TicketForm">
                 <h2>Crear ticket
                     <small><small><small>
-                        {` (${this.state.product.name} v${this.state.product.version})`}
+                        {` (${this.state.productName} v${this.state.productVersion})`}
                     </small></small></small>
                 </h2>
                 <Form className="form" onSubmit={(e) => this.postTicket(e)}>
@@ -88,9 +86,14 @@ class TicketPage extends Component {
                     <FormGroup>
                         <Label for="client">Cliente</Label>
                         <Input type="select" name="select" id="client">
-                            <option>Juan Fiuba</option>
-                            <option>Lucas Diaz</option>
-                            <option>Ana Rodriguez</option>
+                            {
+                                this.state.clients.map((client, index) => {
+                                    return (
+                                        <option key={index}>
+                                            {client["razon social"]}
+                                        </option>);
+                                })
+                            }
                         </Input>
                     </FormGroup>
 
@@ -113,7 +116,6 @@ class TicketPage extends Component {
                     </FormGroup>
 
                     <Button>Crear Ticket</Button>
-                    {/*<Input type="reset"> </Input>*/}
                 </Form>
             </div>
             </div>
@@ -124,4 +126,4 @@ class TicketPage extends Component {
 export default compose(
     withParams,
     withLocation
-)(TicketPage)
+)(TicketForm)

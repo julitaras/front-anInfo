@@ -9,8 +9,8 @@ class App extends Component {
   render() {
     return (
       <Routes>
-        {routes.map(({ path, Component }) => (
-          <Route path={path} element={Component} />
+        {routes.map(({ path, Component }, index) => (
+          <Route key={index} path={path} element={Component} />
         ))}
       </Routes>
     );
