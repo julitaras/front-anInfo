@@ -49,6 +49,7 @@ class ProductsTable extends Component {
                                                     state={{ productID: product.id }}>Ver tickets</Link></td>
                                             </tr>);
                                     }
+                                    return "";
                                 })}
                             </React.Fragment>
                         )}
