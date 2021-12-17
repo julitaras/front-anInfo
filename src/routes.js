@@ -2,7 +2,7 @@ import TicketForm from "./components/form/TicketForm";
 import HomePage from "./components/page/HomePage";
 import ProductsPage from "./components/page/ProductsPage";
 
-export default [
+const routes = [
     { path: "/", name: "Inicio", Component: <HomePage /> },
     /* Agregar rutas a componentes de otros modulos */
     { path: "/products", name: "Productos", Component: <ProductsPage /> },
@@ -11,3 +11,4 @@ export default [
     /*{ path: "/ticket/:name/:version/query", name: "Consulta Tickets", Component: TicketTable }*/
   ];
 
+export default routes;
