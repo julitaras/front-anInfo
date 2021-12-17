@@ -14,6 +14,7 @@ import {
   } from 'reactstrap';
 import Header from "../Header";
 import withNavigate from "../../hoc/withNavigate";
+import { Breadcrumb, Container } from "react-bootstrap";
 
 class TicketForm extends Component {
 
@@ -84,6 +85,15 @@ class TicketForm extends Component {
         return (
             <div>
             <Header {...this.props} />
+            <Container>
+                <Breadcrumb>
+                    <Breadcrumb.Item href="/">Inicio</Breadcrumb.Item>
+                    <Breadcrumb.Item href="/products">Productos</Breadcrumb.Item>
+                    <Breadcrumb.Item active>{this.props.params.name}</Breadcrumb.Item>
+                    <Breadcrumb.Item active>{this.props.params.version}</Breadcrumb.Item>
+                    <Breadcrumb.Item active>Crear Ticket</Breadcrumb.Item>
+                </Breadcrumb>
+            </Container>
             
             <div className="TicketForm">
                 <h2>Crear ticket
