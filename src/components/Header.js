@@ -27,8 +27,6 @@ class Header extends Component {
                     : path,
                   ...rest
                 }));
-        console.log('Generated crumbs for ${props.match.path}');
-        crumbs.map(({ name, path }) => console.log({ name, path }));
         // Given an array of objects which contain a `name` and `path` property,
         // generate a `BreadcrumbItem` component for each.
         this.crumbs_items = crumbs.map(({ name, path }, index) => (
