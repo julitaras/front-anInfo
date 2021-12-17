@@ -3,7 +3,8 @@ import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation"
 import ClientService from "../../service/ClientService";
-
+import EmployeeService from "../../service/EmployeeService";
+import TicketService from "../../service/TicketService";
 import {
     Button,
     Form,
@@ -12,16 +13,15 @@ import {
     Label
   } from 'reactstrap';
 import Header from "../Header";
+import withNavigate from "../../hoc/withNavigate";
 
 class TicketForm extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            productID: " ",
-            productName: " ",
-            productVersion: " ",
-            clients: []
+            clients: [],
+            employees: []
         };
         //this.postTicket = this.postTicket.bind(this);
     }
@@ -35,20 +35,48 @@ class TicketForm extends Component {
         });
     }
 
-    componentDidMount() {
-        const productID = this.props.location.state.productID;
-        const {name, version} = this.props.params;
-        this.setState({
-            productID: productID,
-            productName: name,
-            productVersion: version,
+    _setEmployeesState() {
+        const employeeService = new EmployeeService();
+        employeeService.getEmployees().then(response => {
+            this.setState( {
+                employees: response
+            })
         });
+    }
+
+    componentDidMount() {
+        //const productID = this.props.location.state.productID;
+        //const {name, version} = this.props.params
+        //this._setEmployeesState();
         this._setClientsState();
     }
 
     postTicket(e) {
+        const formData = new FormData(e.target);
         e.preventDefault();
-        console.log(this.props);
+        var ticket = {};
+        for (let [key, value] of formData.entries()) {
+            ticket[key] = value;
+        }
+        ticket["productID"] = this.props.location.state.productID;
+        ticket["productVersion"] = this.props.params.version;
+        ticket["employeeID"] = ticket["employeeID"] == "sin-responsable" ? null : ticket["employeeID"];
+        console.log(ticket);
+        const ticketService = new TicketService();
+        
+        ticketService.postTicket(ticket).then(response => {
+            // Check if the response is success and redirect to home
+            // if not, raise an alert
+            console.log(response);
+            
+            if (response.status == 200) {
+                console.log(this.props);
+                this.props.history("/products");
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("Error al crear ticket")
+        });
     }
 
     render() {
@@ -59,7 +87,7 @@ class TicketForm extends Component {
             <div className="TicketForm">
                 <h2>Crear ticket
                     <small><small><small>
-                        {` (${this.state.productName} v${this.state.productVersion})`}
+                        {` (${this.props.params.name} v${this.props.params.version})`}
                     </small></small></small>
                 </h2>
                 <Form className="form" onSubmit={(e) => this.postTicket(e)}>
@@ -67,7 +95,7 @@ class TicketForm extends Component {
                         <Label for="subject">Asunto</Label>
                         <Input
                             type="text"
-                            name="text"
+                            name="subject"
                             id="subject"
                             placeholder="Asunto de ejemplo"
                         />
@@ -77,7 +105,7 @@ class TicketForm extends Component {
                         <Label for="description">Descripcion</Label>
                         <Input
                             type="textarea"
-                            name="textarea"
+                            name="description"
                             id="description"
                             placeholder="Descripcion de ejemplo"
                         />
@@ -85,11 +113,11 @@ class TicketForm extends Component {
 
                     <FormGroup>
                         <Label for="client">Cliente</Label>
-                        <Input type="select" name="select" id="client">
+                        <Input type="select" name="clientID" id="client">
                             {
                                 this.state.clients.map((client, index) => {
                                     return (
-                                        <option key={index}>
+                                        <option key={index} value={client['id']}>
                                             {client["razon social"]}
                                         </option>);
                                 })
@@ -99,19 +127,26 @@ class TicketForm extends Component {
 
                     <FormGroup>
                         <Label for="type">Tipo</Label>
-                        <Input type="select" name="select" id="type">
-                            <option>Consulta</option>
-                            <option>Error</option>
+                        <Input type="select" name="type" id="type">
+                            <option value="QUERY">Consulta</option>
+                            <option value="error22">Error</option>
                         </Input>
                     </FormGroup>
 
                     <FormGroup>
                         <Label for="severity">Severidad</Label>
-                        <Input type="select" name="select" id="severity">
+                        <Input type="select" name="severity" id="severity">
                             <option>S1</option>
                             <option>S2</option>
                             <option>S3</option>
                             <option>S4</option>
+                        </Input>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label for="employeeID">Responsable</Label>
+                        <Input type="select" name="employeeID" id="employeeID">
+                            <option value="sin-responsable" >Sin responsable</option>
                         </Input>
                     </FormGroup>
 
@@ -125,5 +160,6 @@ class TicketForm extends Component {
 
 export default compose(
     withParams,
-    withLocation
+    withLocation,
+    withNavigate
 )(TicketForm)
