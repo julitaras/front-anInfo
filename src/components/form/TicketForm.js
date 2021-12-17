@@ -84,6 +84,7 @@ class TicketForm extends Component {
         return (
             <div>
             <Header {...this.props} />
+            
             <div className="TicketForm">
                 <h2>Crear ticket
                     <small><small><small>

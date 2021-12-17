@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {Col, Container, Row} from "react-bootstrap";
+import { Col, Container, Row} from "react-bootstrap";
 import Header from "../Header";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation"
@@ -7,12 +7,14 @@ import { compose } from "redux";
 import {Alert, Card, Button} from "react-bootstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs, faTasks, faUsers } from '@fortawesome/free-solid-svg-icons'
+import Breadcrumbs from "../Breadcrumbs";
 class HomePage extends Component {
 
     render() {
         return (<div className="App">
           <Container>
               <Header {...this.props} />
+              <Breadcrumbs {...this.props} />
               <Alert variant="primary">
                 Bienvenido al sitio web del sistema de gestión de PSA.
               </Alert>

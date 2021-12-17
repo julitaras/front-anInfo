@@ -5,6 +5,7 @@ import Header from "../Header";
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation"
+import Breadcrumbs from "../Breadcrumbs";
 
 class ProductsPage extends Component {
 
@@ -29,6 +30,7 @@ class ProductsPage extends Component {
         return (
             <div>
                 <Header {...this.props} />
+                <Breadcrumbs {...this.props} />
                 <ProductsTable products={this.state.products} />
             </div>);
     }
