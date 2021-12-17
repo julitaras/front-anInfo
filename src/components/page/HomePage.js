@@ -1,6 +1,4 @@
 import React, {Component} from "react"
-import logo from '../../logo.svg';
-import Nav from "react-bootstrap/Nav";
 import {Col, Container, Row} from "react-bootstrap";
 import Header from "../Header";
 import withParams from "../../hoc/withParams";
