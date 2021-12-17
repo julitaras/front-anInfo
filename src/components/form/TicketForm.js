@@ -60,7 +60,7 @@ class TicketForm extends Component {
         }
         ticket["productID"] = this.props.location.state.productID;
         ticket["productVersion"] = this.props.params.version;
-        ticket["employeeID"] = ticket["employeeID"] == "sin-responsable" ? null : ticket["employeeID"];
+        ticket["employeeID"] = ticket["employeeID"] === "sin-responsable" ? null : ticket["employeeID"];
         console.log(ticket);
         const ticketService = new TicketService();
         
@@ -69,7 +69,7 @@ class TicketForm extends Component {
             // if not, raise an alert
             console.log(response);
             
-            if (response.status == 200) {
+            if (response.status === 200) {
                 console.log(this.props);
                 this.props.history("/products");
             }
