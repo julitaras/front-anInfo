@@ -40,7 +40,7 @@ class TicketForm extends Component {
         const employeeService = new EmployeeService();
         employeeService.getEmployees().then(response => {
             this.setState( {
-                employees: response
+                employees: response.data
             })
         });
     }
@@ -48,7 +48,7 @@ class TicketForm extends Component {
     componentDidMount() {
         //const productID = this.props.location.state.productID;
         //const {name, version} = this.props.params
-        //this._setEmployeesState();
+        this._setEmployeesState();
         this._setClientsState();
     }
 
@@ -81,7 +81,6 @@ class TicketForm extends Component {
     }
 
     render() {
-        console.log(this.state.clients);
         return (
             <div>
             <Header {...this.props} />
@@ -158,6 +157,14 @@ class TicketForm extends Component {
                         <Label for="employeeID">Responsable</Label>
                         <Input type="select" name="employeeID" id="employeeID">
                             <option value="sin-responsable" >Sin responsable</option>
+                            {
+                                this.state.employees.map((employee, index) => {
+                                    return (
+                                        <option key={index} value={employee['legajo']}>
+                                            {employee["Nombre"] + ' ' + employee["Apellido"]}
+                                        </option>);
+                                })
+                            }
                         </Input>
                     </FormGroup>
 

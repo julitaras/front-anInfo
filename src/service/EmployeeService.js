@@ -4,7 +4,7 @@ class EmployeeService {
 
     async getEmployees() {
         const response = await axios.get("https://squad1720212c.herokuapp.com/empleados");
-        return response.data;
+        return response;
     }
 };
 
