@@ -139,7 +139,7 @@ class TicketForm extends Component {
                         <Label for="type">Tipo</Label>
                         <Input type="select" name="type" id="type">
                             <option value="QUERY">Consulta</option>
-                            <option value="error22">Error</option>
+                            <option value="ERROR">Error</option>
                         </Input>
                     </FormGroup>
 
@@ -165,6 +165,17 @@ class TicketForm extends Component {
                                         </option>);
                                 })
                             }
+                        </Input>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label for="state">Estado</Label>
+                        <Input type="select" name="state" id="state">
+                            <option value="OPEN">Abierto</option>
+                            <option value="IN_PROGRESS">En progreso</option>
+                            <option value="WAITING_CLIENT">Esperando cliente</option>
+                            <option value="WAITING_DEVELOPMENT">Esperando desarrollo</option>
+                            <option value="CLOSED">Cerrado</option>
                         </Input>
                     </FormGroup>
 
