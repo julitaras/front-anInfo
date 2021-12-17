@@ -53,14 +53,15 @@ class TicketForm extends Component {
     }
 
     postTicket(e) {
+        
         const formData = new FormData(e.target);
         e.preventDefault();
         var ticket = {};
         for (let [key, value] of formData.entries()) {
             ticket[key] = value;
         }
-        ticket["productID"] = this.props.location.state.productID;
-        ticket["productVersion"] = this.props.params.version;
+        ticket["productID"] = this.props.state.productID;
+        ticket["productVersion"] = this.props.version;
         ticket["employeeID"] = ticket["employeeID"] === "sin-responsable" ? null : ticket["employeeID"];
         console.log(ticket);
         const ticketService = new TicketService();
@@ -82,25 +83,9 @@ class TicketForm extends Component {
 
     render() {
         return (
-            <div>
-            <Header {...this.props} />
             <Container>
-                <Breadcrumb>
-                    <Breadcrumb.Item href="/">Inicio</Breadcrumb.Item>
-                    <Breadcrumb.Item href="/products">Productos</Breadcrumb.Item>
-                    <Breadcrumb.Item active>{this.props.params.name}</Breadcrumb.Item>
-                    <Breadcrumb.Item active>{this.props.params.version}</Breadcrumb.Item>
-                    <Breadcrumb.Item active>Crear Ticket</Breadcrumb.Item>
-                </Breadcrumb>
-            </Container>
-            
-            <div className="TicketForm">
-                <h2>Crear ticket
-                    <small><small><small>
-                        {` (${this.props.params.name} v${this.props.params.version})`}
-                    </small></small></small>
-                </h2>
-                <Form className="form" onSubmit={(e) => this.postTicket(e)}>
+            <div>
+                <Form onSubmit={(e) => this.postTicket(e)}>
                     <FormGroup>
                         <Label for="subject">Asunto</Label>
                         <Input
@@ -182,7 +167,7 @@ class TicketForm extends Component {
                     <Button>Crear Ticket</Button>
                 </Form>
             </div>
-            </div>
+            </Container>
         );
     }
 }
