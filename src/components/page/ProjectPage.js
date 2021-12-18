@@ -182,7 +182,7 @@ const ProjectPage = (props) => {
       <Breadcrumbs {...props} />
 
       <Container>
-        <div className="project-button-container">
+        <aside className="project-button-container">
           <Input
             style={{ width: "80%" }}
             type="search"
@@ -192,7 +192,7 @@ const ProjectPage = (props) => {
           <Button onClick={openModalHandler} variant="primary">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
-        </div>
+        </aside>
 
         <Modal size="lg" show={modalIsOpen} onHide={closeModalHandler}>
           <Modal.Header closeButton>
