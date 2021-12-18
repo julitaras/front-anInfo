@@ -37,10 +37,7 @@ class TicketTable extends Component {
     render() {
         //console.log(this.state);
         const table =
-            <div className="TicketsTable"
-                 style={{ display: 'block', padding: 30 }}>
-                <Header Header={"hola"} {...this.props} />
-                <Breadcrumbs {...this.props} />
+                <Container>
                 <Table striped bordered hover>
                     <thead>
                     <tr>
@@ -87,10 +84,11 @@ class TicketTable extends Component {
                     )}
                     </tbody>
                 </Table>
-            </div>
-
+                </Container>
         return (
-            <div className="TicketList">
+            <div>
+                <Header Header={"hola"} {...this.props} />
+                <Breadcrumbs {...this.props} />
                 {table}
             </div>
         );
