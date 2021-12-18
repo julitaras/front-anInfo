@@ -6,8 +6,11 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { compose } from "redux";
+import {Container} from "react-bootstrap"
+import Header from "../Header";
+import Breadcrumbs from "../Breadcrumbs";
 
-const Container = styled.div`
+const TaskContainer = styled.div`
     display : flex;
 `
 
@@ -87,10 +90,13 @@ const ProjectPage = (props) => {
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <Container>
+      <Header {...props} />
+      <Breadcrumbs {...props} />
+      <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId='all-columns' direction='horizontal' type='column'>
         {(provided) => (
-          <Container {...provided.droppableProps} ref={provided.innerRef}>
+          <TaskContainer {...provided.droppableProps} ref={provided.innerRef}>
             {data.columnOrder.map((id, index) => {
               const column = data.columns[id]
               const tasks = column.taskIds.map(taskId => data.tasks[taskId])
@@ -98,10 +104,12 @@ const ProjectPage = (props) => {
               return <Column key={column.id} column={column} tasks={tasks} index={index} />
             })}
             {provided.placeholder}
-          </Container>
+          </TaskContainer>
         )}
       </Droppable>
     </DragDropContext>
+    </Container>
+
   )
 }
 
