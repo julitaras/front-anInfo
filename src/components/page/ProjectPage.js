@@ -186,36 +186,39 @@ const ProjectPage = (props) => {
       </Container>
 
       <Container>
-        {projects.map((project) => (
-          <Card className="project-card" key={project.id}>
-            <Card.Header>{project.name}</Card.Header>
-            <Card.Body>
-              {/* <Card.Title></Card.Title> */}
-              <Card.Text>
-                <div className="project-card-content">
-                  <div className="project-card-state">
-                    <p>Estado: {project.state}</p>
+        {projects.length < 1 && <p>No hay proyectos aun...</p>}
+        {projects.length > 0 &&
+          projects.map((project) => (
+            <Card className="project-card" key={project.id}>
+              <Card.Header>{project.name}</Card.Header>
+              <Card.Body>
+                {/* <Card.Title></Card.Title> */}
+                <Card.Text>
+                  <div className="project-card-content">
+                    <div className="project-card-state">
+                      <p>Estado: {project.state}</p>
+                    </div>
+                    <div className="project-card-dates">
+                      <p>
+                        Comienzo:{" "}
+                        {new Date(project.start_date).toLocaleDateString()}
+                      </p>
+                      <p>
+                        Fin:{" "}
+                        {new Date(project.finish_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="project-card-hours">
+                      <p>Horas estimadas: {project.worked_hours}</p>
+                    </div>
                   </div>
-                  <div className="project-card-dates">
-                    <p>
-                      Comienzo:{" "}
-                      {new Date(project.start_date).toLocaleDateString()}
-                    </p>
-                    <p>
-                      Fin: {new Date(project.finish_date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="project-card-hours">
-                    <p>Horas estimadas: {project.worked_hours}</p>
-                  </div>
-                </div>
-              </Card.Text>
-              <Button href={`/projects/${project.id}`} variant="primary">
-                Ver Proyecto
-              </Button>
-            </Card.Body>
-          </Card>
-        ))}
+                </Card.Text>
+                <Button href={`/projects/${project.id}`} variant="primary">
+                  Ver Proyecto
+                </Button>
+              </Card.Body>
+            </Card>
+          ))}
       </Container>
     </>
   );
