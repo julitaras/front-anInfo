@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useEffect, useState } from "react";
 import Header from "../Header";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
@@ -18,6 +18,7 @@ import {
   Button,
   Modal,
 } from "react-bootstrap";
+import { Input, Label } from "reactstrap";
 
 const dummyValue = [
   {
@@ -145,7 +146,10 @@ const dummyValue = [
 const path = "https://squad14-2c-2021.herokuapp.com";
 
 const ProjectPage = (props) => {
-  const [projects, setProjects] = useState(dummyValue);
+  const [projects, setProjects] = useState({
+    active: dummyValue,
+    all: dummyValue,
+  });
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const openModalHandler = () => {
@@ -157,12 +161,21 @@ const ProjectPage = (props) => {
     setModalIsOpen(false);
   };
 
+  const searchHandler = (e) => {
+    const projectsFilter = projects?.all?.filter((project) =>
+      project.name.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    console.log(projectsFilter);
+    setProjects({ ...projects, active: projectsFilter });
+  };
+
   useLayoutEffect(() => {
     axios
       .get(`${path}/projects`)
       .then((res) => console.log(res.data))
       .catch((err) => console.error(err));
   }, []);
+
   return (
     <>
       <Header {...props} />
@@ -170,6 +183,12 @@ const ProjectPage = (props) => {
 
       <Container>
         <div className="project-button-container">
+          <Input
+            style={{ width: "80%" }}
+            type="search"
+            placeholder="Buscar proyectos"
+            onChange={searchHandler}
+          />
           <Button onClick={openModalHandler} variant="primary">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
@@ -186,9 +205,9 @@ const ProjectPage = (props) => {
       </Container>
 
       <Container>
-        {projects.length < 1 && <p>No hay proyectos aun...</p>}
-        {projects.length > 0 &&
-          projects.map((project) => (
+        {projects?.active?.length < 1 && <p>No hay proyectos aun...</p>}
+        {projects?.active?.length > 0 &&
+          projects?.active?.map((project) => (
             <Card className="project-card" key={project.id}>
               <Card.Header>{project.name}</Card.Header>
               <Card.Body>
