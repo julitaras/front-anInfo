@@ -136,7 +136,9 @@ const ProjectForm = (props) => {
             <span className="form-required">*</span>Campos obligatorios
           </p>
           <Modal.Footer>
-            <Button variant="primary">Crear Proyecto</Button>
+            <Button type="submit" variant="primary">
+              Crear Proyecto
+            </Button>
           </Modal.Footer>
         </Form>
       </div>

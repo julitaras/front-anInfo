@@ -21,145 +21,22 @@ import {
 } from "react-bootstrap";
 import { Input, Label } from "reactstrap";
 
-const dummyValue = [
-  {
-    id: 100,
-    name: "NOMBRE DE LA TAREA",
-    description: "PRUEBA DE UNA TAREA",
-    start_date: "2021-12-14T00:00:00Z",
-    finish_date: "2021-12-14T00:00:00Z",
-    worked_hours: 0,
-    leader: "ES UN LIDER",
-    state: "TODO",
-  },
-  {
-    id: 12,
-    name: "NOMBRE DE LA TAREA",
-    description: "PRUEBA DE UNA TAREA",
-    start_date: "2021-12-14T00:00:00Z",
-    finish_date: "2021-12-14T00:00:00Z",
-    worked_hours: 0,
-    leader: "ES UN LIDER",
-    state: "TODO",
-  },
-  {
-    id: 11,
-    name: "Proyecto editado",
-    description: "Descripcion editada",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 15,
-    leader: "Joaco",
-    state: "IN_PROGRESS",
-  },
-  {
-    id: 10,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "",
-  },
-  {
-    id: 9,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "IN_PROGRESS",
-  },
-  {
-    id: 8,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "TODO",
-  },
-  {
-    id: 7,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "",
-  },
-  {
-    id: 6,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "",
-  },
-  {
-    id: 5,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "STARTED",
-  },
-  {
-    id: 4,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "STARTED",
-  },
-  {
-    id: 3,
-    name: "Proyecto",
-    description: "Esto es la descripccion de un proyecto",
-    start_date: "2021-12-03T00:00:00Z",
-    finish_date: "2022-03-12T00:00:00Z",
-    worked_hours: 12,
-    leader: "mario bros",
-    state: "STARTED",
-  },
-  {
-    id: 2,
-    name: "Proyect_3",
-    description: "Soy proyecto 3",
-    start_date: "2011-01-13T00:00:00Z",
-    finish_date: "2312-03-13T00:00:00Z",
-    worked_hours: 3000,
-    leader: "Jorge3",
-    state: "FINISHED3",
-  },
-];
-
 const path = "https://squad14-2c-2021.herokuapp.com";
 
 const ProjectPage = (props) => {
   const [projects, setProjects] = useState({
-    active: dummyValue,
-    all: dummyValue,
+    active: [],
+    all: [],
   });
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalCreateProjectIsOpen, setCreateProjectModalIsOpen] =
+    useState(false);
 
-  const openModalHandler = () => {
-    setModalIsOpen(true);
-    console.log("OPEN MODAL");
+  const openCreateProjectModalHandler = () => {
+    setCreateProjectModalIsOpen(true);
   };
 
-  const closeModalHandler = () => {
-    setModalIsOpen(false);
+  const closeCreateProjectModalHandler = () => {
+    setCreateProjectModalIsOpen(false);
   };
 
   const searchHandler = (e) => {
@@ -173,7 +50,7 @@ const ProjectPage = (props) => {
   useLayoutEffect(() => {
     axios
       .get(`${path}/projects`)
-      .then((res) => console.log(res.data))
+      .then((res) => setProjects({ active: res.data, all: res.data }))
       .catch((err) => console.error(err));
   }, []);
 
@@ -190,12 +67,16 @@ const ProjectPage = (props) => {
             placeholder="Buscar proyectos"
             onChange={searchHandler}
           />
-          <Button onClick={openModalHandler} variant="primary">
+          <Button onClick={openCreateProjectModalHandler} variant="primary">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
         </aside>
 
-        <Modal size="lg" show={modalIsOpen} onHide={closeModalHandler}>
+        <Modal
+          size="lg"
+          show={modalCreateProjectIsOpen}
+          onHide={closeCreateProjectModalHandler}
+        >
           <Modal.Header closeButton>
             <Modal.Title>Crear Proyecto</Modal.Title>
           </Modal.Header>
@@ -229,7 +110,7 @@ const ProjectPage = (props) => {
                       </p>
                     </div>
                     <div className="project-card-hours">
-                      <p>Horas estimadas: {project.worked_hours}</p>
+                      <p>Horas trabajadas: {project.worked_hours}</p>
                     </div>
                   </div>
                 </Card.Text>
@@ -237,9 +118,7 @@ const ProjectPage = (props) => {
                   <Button href={`/projects/${project.id}`} variant="primary">
                     Ver Proyecto
                   </Button>
-                  <Button variant="danger">
-                    Eliminar Proyecto
-                  </Button>
+                  <Button variant="danger">Eliminar Proyecto</Button>
                 </div>
               </Card.Body>
             </Card>
