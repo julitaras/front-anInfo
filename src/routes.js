@@ -11,6 +11,7 @@ const routes = [
     /* Modulo Soporte */
     { path: "/products", name: "Productos", Component: <ProductsPage /> },
     { path: "/tickets/:name/:version/create", name: "Crear Ticket", Component: <TicketForm /> },
+    { path: "/tickets", name: "Consulta Tickets", Component: <TicketTable /> },
     { path: "/tickets/:name/:version/query", name: "Consulta Tickets", Component: <TicketTable /> },
     { path: "/tickets/:name/:version/:ticketID", name: "Consulta Ticket", Component: <TicketPage /> },
     /* Modulo Recursos */
