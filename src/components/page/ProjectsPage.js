@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useEffect, useState } from "react";
 import Header from "../Header";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
@@ -18,6 +18,7 @@ import {
   Button,
   Modal,
 } from "react-bootstrap";
+import { Input, Label } from "reactstrap";
 
 const dummyValue = [
   {
@@ -144,8 +145,11 @@ const dummyValue = [
 
 const path = "https://squad14-2c-2021.herokuapp.com";
 
-const ProjectsPage = (props) => {
-  const [projects, setProjects] = useState(dummyValue);
+const ProjectPage = (props) => {
+  const [projects, setProjects] = useState({
+    active: dummyValue,
+    all: dummyValue,
+  });
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const openModalHandler = () => {
@@ -157,23 +161,38 @@ const ProjectsPage = (props) => {
     setModalIsOpen(false);
   };
 
+  const searchHandler = (e) => {
+    const projectsFilter = projects?.all?.filter((project) =>
+      project.name.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    console.log(projectsFilter);
+    setProjects({ ...projects, active: projectsFilter });
+  };
+
   useLayoutEffect(() => {
     axios
       .get(`${path}/projects`)
       .then((res) => console.log(res.data))
       .catch((err) => console.error(err));
   }, []);
+
   return (
     <>
       <Header {...props} />
       <Breadcrumbs {...props} />
 
       <Container>
-        <div className="project-button-container">
+        <aside className="project-button-container">
+          <Input
+            style={{ width: "80%" }}
+            type="search"
+            placeholder="Buscar proyectos"
+            onChange={searchHandler}
+          />
           <Button onClick={openModalHandler} variant="primary">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
-        </div>
+        </aside>
 
         <Modal size="lg" show={modalIsOpen} onHide={closeModalHandler}>
           <Modal.Header closeButton>
@@ -186,39 +205,42 @@ const ProjectsPage = (props) => {
       </Container>
 
       <Container>
-        {projects.map((project) => (
-          <Card className="project-card" key={project.id}>
-            <Card.Header>{project.name}</Card.Header>
-            <Card.Body>
-              {/* <Card.Title></Card.Title> */}
-              <Card.Text>
-                <div className="project-card-content">
-                  <div className="project-card-state">
-                    <p>Estado: {project.state}</p>
+        {projects?.active?.length < 1 && <p>No hay proyectos aun...</p>}
+        {projects?.active?.length > 0 &&
+          projects?.active?.map((project) => (
+            <Card className="project-card" key={project.id}>
+              <Card.Header>{project.name}</Card.Header>
+              <Card.Body>
+                {/* <Card.Title></Card.Title> */}
+                <Card.Text>
+                  <div className="project-card-content">
+                    <div className="project-card-state">
+                      <p>Estado: {project.state}</p>
+                    </div>
+                    <div className="project-card-dates">
+                      <p>
+                        Comienzo:{" "}
+                        {new Date(project.start_date).toLocaleDateString()}
+                      </p>
+                      <p>
+                        Fin:{" "}
+                        {new Date(project.finish_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="project-card-hours">
+                      <p>Horas estimadas: {project.worked_hours}</p>
+                    </div>
                   </div>
-                  <div className="project-card-dates">
-                    <p>
-                      Comienzo:{" "}
-                      {new Date(project.start_date).toLocaleDateString()}
-                    </p>
-                    <p>
-                      Fin: {new Date(project.finish_date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="project-card-hours">
-                    <p>Horas estimadas: {project.worked_hours}</p>
-                  </div>
-                </div>
-              </Card.Text>
-              <Button href={`/projects/${project.id}`} variant="primary">
-                Ver Proyecto
-              </Button>
-            </Card.Body>
-          </Card>
-        ))}
+                </Card.Text>
+                <Button href={`/projects/${project.id}`} variant="primary">
+                  Ver Proyecto
+                </Button>
+              </Card.Body>
+            </Card>
+          ))}
       </Container>
     </>
   );
 };
 
-export default compose(withParams, withLocation)(ProjectsPage);
+export default compose(withParams, withLocation)(ProjectPage);

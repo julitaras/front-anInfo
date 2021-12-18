@@ -3,6 +3,9 @@ import styled from 'styled-components'
 import dataset from '../../dataset/dataset.js'
 import Column from '../column/Column'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import withParams from "../../hoc/withParams";
+import withLocation from "../../hoc/withLocation";
+import { compose } from "redux";
 
 const Container = styled.div`
     display : flex;
