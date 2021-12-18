@@ -1,224 +1,105 @@
-import React, { useLayoutEffect, useState } from "react";
-import Header from "../Header";
-import { compose } from "redux";
-import withParams from "../../hoc/withParams";
-import withLocation from "../../hoc/withLocation";
-import Breadcrumbs from "../Breadcrumbs";
-import axios from "axios";
-import ProjectForm from "../form/ProjectForm";
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import dataset from '../../dataset/dataset.js'
+import Column from '../column/Column'
+import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 
-import { faPlusSquare, faList } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Col,
-  Container,
-  Row,
-  Alert,
-  Card,
-  Button,
-  Modal,
-} from "react-bootstrap";
-
-const dummyValue = [
-  {
-    id: 100,
-    name: "NOMBRE DE LA TAREA",
-    description: "PRUEBA DE UNA TAREA",
-    start_date: "2021-12-14T00:00:00Z",
-    finish_date: "2021-12-14T00:00:00Z",
-    worked_hours: 0,
-    leader: "ES UN LIDER",
-    state: "TODO",
-  },
-  {
-    id: 12,
-    name: "NOMBRE DE LA TAREA",
-    description: "PRUEBA DE UNA TAREA",
-    start_date: "2021-12-14T00:00:00Z",
-    finish_date: "2021-12-14T00:00:00Z",
-    worked_hours: 0,
-    leader: "ES UN LIDER",
-    state: "TODO",
-  },
-  {
-    id: 11,
-    name: "Proyecto editado",
-    description: "Descripcion editada",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 15,
-    leader: "Joaco",
-    state: "IN_PROGRESS",
-  },
-  {
-    id: 10,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "",
-  },
-  {
-    id: 9,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "IN_PROGRESS",
-  },
-  {
-    id: 8,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "TODO",
-  },
-  {
-    id: 7,
-    name: "Proyecto aninfo2",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-05T00:00:00Z",
-    finish_date: "2021-12-07T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo2",
-    state: "",
-  },
-  {
-    id: 6,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "",
-  },
-  {
-    id: 5,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "STARTED",
-  },
-  {
-    id: 4,
-    name: "Proyecto aninfo",
-    description: "Descripcion del proyecto",
-    start_date: "2021-12-02T00:00:00Z",
-    finish_date: "2021-12-03T00:00:00Z",
-    worked_hours: 0,
-    leader: "Juancarlo",
-    state: "STARTED",
-  },
-  {
-    id: 3,
-    name: "Proyecto",
-    description: "Esto es la descripccion de un proyecto",
-    start_date: "2021-12-03T00:00:00Z",
-    finish_date: "2022-03-12T00:00:00Z",
-    worked_hours: 12,
-    leader: "mario bros",
-    state: "STARTED",
-  },
-  {
-    id: 2,
-    name: "Proyect_3",
-    description: "Soy proyecto 3",
-    start_date: "2011-01-13T00:00:00Z",
-    finish_date: "2312-03-13T00:00:00Z",
-    worked_hours: 3000,
-    leader: "Jorge3",
-    state: "FINISHED3",
-  },
-];
-
-const path = "https://squad14-2c-2021.herokuapp.com";
+const Container = styled.div`
+    display : flex;
+`
 
 const ProjectPage = (props) => {
-  const [projects, setProjects] = useState(dummyValue);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [data, setData] = useState(dataset)
 
-  const openModalHandler = () => {
-    setModalIsOpen(true);
-    console.log("OPEN MODAL");
-  };
+  const onDragEnd = result => {
+    const { destination, source, draggableId, type } = result;
+    //If there is no destination
+    if (!destination) { return }
 
-  const closeModalHandler = () => {
-    setModalIsOpen(false);
-  };
+    //If source and destination is the same
+    if (destination.droppableId === source.droppableId && destination.index === source.index) { return }
 
-  useLayoutEffect(() => {
-    axios
-      .get(`${path}/projects`)
-      .then((res) => console.log(res.data))
-      .catch((err) => console.error(err));
-  }, []);
+    //If you're dragging columns
+    if (type === 'column') {
+      const newColumnOrder = Array.from(data.columnOrder);
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+      const newState = {
+        ...data,
+        columnOrder: newColumnOrder
+      }
+      setData(newState)
+      return;
+    }
+
+    //Anything below this happens if you're dragging tasks
+    const start = data.columns[source.droppableId];
+    const finish = data.columns[destination.droppableId];
+
+    //If dropped inside the same column
+    if (start === finish) {
+      const newTaskIds = Array.from(start.taskIds);
+      newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, draggableId);
+      const newColumn = {
+        ...start,
+        taskIds: newTaskIds
+      }
+      const newState = {
+        ...data,
+        columns: {
+          ...data.columns,
+          [newColumn.id]: newColumn
+        }
+      }
+      setData(newState)
+      return;
+    }
+
+    //If dropped in a different column
+    const startTaskIds = Array.from(start.taskIds);
+    startTaskIds.splice(source.index, 1);
+    const newStart = {
+      ...start,
+      taskIds: startTaskIds
+    }
+
+    const finishTaskIds = Array.from(finish.taskIds);
+    finishTaskIds.splice(destination.index, 0, draggableId);
+    const newFinish = {
+      ...finish,
+      taskIds: finishTaskIds
+    }
+
+    const newState = {
+      ...data,
+      columns: {
+        ...data.columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish
+      }
+    }
+
+    setData(newState)
+  }
+
   return (
-    <>
-      <Header {...props} />
-      <Breadcrumbs {...props} />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId='all-columns' direction='horizontal' type='column'>
+        {(provided) => (
+          <Container {...provided.droppableProps} ref={provided.innerRef}>
+            {data.columnOrder.map((id, index) => {
+              const column = data.columns[id]
+              const tasks = column.taskIds.map(taskId => data.tasks[taskId])
 
-      <Container>
-        <div className="project-button-container">
-          <Button onClick={openModalHandler} variant="primary">
-            <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
-          </Button>
-        </div>
-
-        <Modal size="lg" show={modalIsOpen} onHide={closeModalHandler}>
-          <Modal.Header closeButton>
-            <Modal.Title>Crear Proyecto</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ProjectForm />
-          </Modal.Body>
-        </Modal>
-      </Container>
-
-      <Container>
-        {projects.map((project) => (
-          <Card className="project-card" key={project.id}>
-            <Card.Header>{project.name}</Card.Header>
-            <Card.Body>
-              {/* <Card.Title></Card.Title> */}
-              <Card.Text>
-                <div className="project-card-content">
-                  <div className="project-card-state">
-                    <p>Estado: {project.state}</p>
-                  </div>
-                  <div className="project-card-dates">
-                    <p>
-                      Comienzo:{" "}
-                      {new Date(project.start_date).toLocaleDateString()}
-                    </p>
-                    <p>
-                      Fin: {new Date(project.finish_date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="project-card-hours">
-                    <p>Horas estimadas: {project.worked_hours}</p>
-                  </div>
-                </div>
-              </Card.Text>
-              <Button href={`/projects/${project.id}`} variant="primary">
-                Ver Proyecto
-              </Button>
-            </Card.Body>
-          </Card>
-        ))}
-      </Container>
-    </>
-  );
-};
+              return <Column key={column.id} column={column} tasks={tasks} index={index} />
+            })}
+            {provided.placeholder}
+          </Container>
+        )}
+      </Droppable>
+    </DragDropContext>
+  )
+}
 
 export default compose(withParams, withLocation)(ProjectPage);
