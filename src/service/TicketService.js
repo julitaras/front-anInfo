@@ -8,6 +8,11 @@ class ProductService {
         const response = await axios.post("https://soporte-fiuba.herokuapp.com/tickets", ticketObject);
         return response;  
     }
+
+    async getTickets(query) {
+        const response = await axios.get(`https://soporte-fiuba.herokuapp.com${query}`);
+        return response;
+    }
 };
 
 export default ProductService;

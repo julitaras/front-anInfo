@@ -62,10 +62,18 @@ class ProductsTable extends Component {
                                                 variant="outline-success" size="sm" onClick={e => this.openModal(e.target.value)} >
                                                         <FontAwesomeIcon icon={faPlusSquare}/> Agregar ticket
                                             </Button>
-                                            <Button href={`/ticket/${product.name}/${product.versions[0]}/query`}
-                                            state={{ productID: product.id }} variant="outline-primary" size="sm" >
-                                                <FontAwesomeIcon icon={faList}/> Ver tickets
-                                            </Button>
+                                            <Link
+                                                to={
+                                                    {
+                                                        pathname: `/tickets/${product.name}/${product.versions[0]}/query`,
+                                                        search: `productID=${product.id}&productVersion=${product.versions[0]}`
+                                                    }
+                                                }
+                                                state={{ productID: product.id }}>
+                                                <Button variant="outline-primary" size="sm">
+                                                    <FontAwesomeIcon icon={faList}/> Ver tickets
+                                                </Button>
+                                            </Link>
                                         </Container>
                                     </td>
                                 </tr>
@@ -81,10 +89,18 @@ class ProductsTable extends Component {
                                                     variant="outline-success" size="sm" onClick={e => this.openModal(e.target.value)} >
                                                             <FontAwesomeIcon icon={faPlusSquare}/> Agregar ticket
                                                 </Button>
-                                                <Button href={`/ticket/${product.name}/${version}/query`}
-                                                state={{ productID: product.id }} variant="outline-primary" size="sm" >
-                                                    <FontAwesomeIcon icon={faList}/> Ver tickets
-                                                </Button>
+                                                <Link
+                                                    to={
+                                                        {
+                                                            pathname: `/tickets/${product.name}/${version}/query`,
+                                                            search: `productID=${product.id}&productVersion=${version}`
+                                                        }
+                                                    }
+                                                >
+                                                    <Button variant="outline-primary" size="sm">
+                                                        <FontAwesomeIcon icon={faList}/> Ver tickets
+                                                    </Button>
+                                                </Link>
                                                 </Container>
                                                 </td> 
                                             </tr>);

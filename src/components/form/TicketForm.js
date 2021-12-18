@@ -84,7 +84,7 @@ class TicketForm extends Component {
     render() {
         return (
             <Container>
-            <div>
+            <div className={TicketForm}>
                 <Form onSubmit={(e) => this.postTicket(e)}>
                     <FormGroup>
                         <Label for="subject">Asunto</Label>
