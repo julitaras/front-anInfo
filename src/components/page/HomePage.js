@@ -44,7 +44,7 @@ class HomePage extends Component {
                     <Card.Body>
                       <Card.Title><FontAwesomeIcon icon={faUsers} size="9x" /></Card.Title>
                       <Card.Title>Recursos</Card.Title>
-                      <Button href="/" variant="primary">Ir a Recursos</Button>
+                      <Button href="/hours" variant="primary">Ir a Recursos</Button>
                     </Card.Body>
                   </Card>
                 </Col>
