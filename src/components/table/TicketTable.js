@@ -20,6 +20,7 @@ class TicketTable extends Component {
         this.state = {
             tickets: []
         }
+        console.log(this.props);
     }
 
     componentDidMount() {
@@ -29,6 +30,7 @@ class TicketTable extends Component {
                 {
                     tickets: response.data
                 })
+            console.log(this.state.tickets)
         });
     }
 
@@ -70,7 +72,8 @@ class TicketTable extends Component {
                                     }
                                 <td>
                                     <Container>
-                                        <Button value={"pruebaDetalle"}
+                                        <Button href={`/tickets/${this.props.params.name}/${this.props.params.version}/${ticket.ticketID}`} 
+                                                value={"pruebaDetalle"}
                                                 variant="outline-success" size="sm" >
                                             <FontAwesomeIcon icon={faPlusSquare}/> Ver detalle
                                         </Button>
