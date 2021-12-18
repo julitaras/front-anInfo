@@ -6,6 +6,7 @@ import withLocation from "../../hoc/withLocation";
 import Breadcrumbs from "../Breadcrumbs";
 import axios from "axios";
 import ProjectForm from "../form/ProjectForm";
+import "../../styles/projects.css";
 
 import { faPlusSquare, faList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -232,9 +233,14 @@ const ProjectPage = (props) => {
                     </div>
                   </div>
                 </Card.Text>
-                <Button href={`/projects/${project.id}`} variant="primary">
-                  Ver Proyecto
-                </Button>
+                <div className="project-card-buttons">
+                  <Button href={`/projects/${project.id}`} variant="primary">
+                    Ver Proyecto
+                  </Button>
+                  <Button variant="danger">
+                    Eliminar Proyecto
+                  </Button>
+                </div>
               </Card.Body>
             </Card>
           ))}
