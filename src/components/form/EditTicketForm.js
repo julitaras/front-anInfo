@@ -12,9 +12,8 @@ import {
     Input,
     Label
   } from 'reactstrap';
-import Header from "../Header";
 import withNavigate from "../../hoc/withNavigate";
-import { Breadcrumb, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 const severities = [
     "S1", "S2", "S3", "S4"
@@ -161,6 +160,7 @@ class EditTicketForm extends Component {
         
         const ticketService = new TicketService();
         console.log(ticket);
+        console.log(this.state.ticket.ticketID);
         ticketService.updateTicket(this.state.ticket.ticketID, ticket).then(response => {
             // Check if the response is success and redirect to home
             // if not, raise an alert

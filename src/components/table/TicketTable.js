@@ -11,7 +11,6 @@ import {faList, faPlusSquare} from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import moment from "moment";
-import TicketForm from "../form/TicketForm";
 import EditTicketForm from "../form/EditTicketForm";
 
 class TicketTable extends Component {
@@ -87,11 +86,11 @@ class TicketTable extends Component {
                                     {
                                             (() => {
                                             let expectedDate = moment(ticket.expectedDate);
-                                            let createDate = moment(ticket.createdDate);
-                                            let diff = expectedDate.diff(createDate, 'days');
+                                            let currentDate = moment();
+                                            let diff = expectedDate.diff(currentDate, 'days');
                                             return (
                                                 <td>
-                                                    {diff > 0 ? diff : 0}
+                                                    {diff >= 0 ? diff + 1 : 0}
                                                 </td>
                                             );
                                         })()

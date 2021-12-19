@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {Table} from "reactstrap"
-import { Button, Container, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import {Link} from "react-router-dom"
 import {faPlusSquare, faList} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
