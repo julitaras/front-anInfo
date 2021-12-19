@@ -116,6 +116,19 @@ const ProjectForm = (props) => {
             </Input>
           </FormGroup>
 
+          {type == "edit" && (
+            <FormGroup show={type == "edit"}>
+              <Label for="workedHours">Horas Trabajadas</Label>
+              <Input
+                type="text"
+                name="worked_hours"
+                id="workedHours"
+                value={values.worked_hours}
+                onChange={setValuesHandler}
+              />
+            </FormGroup>
+          )}
+
           <FormGroup>
             <Label for="startDate">
               Fecha de Inicio<span className="form-required">*</span>
