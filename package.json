@@ -20,7 +20,8 @@
     "react-scripts": "^4.0.3",
     "reactstrap": "^9.0.1",
     "redux": "^4.1.2",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "sassy-datepicker": "^0.6.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -47,7 +48,6 @@
     ]
   },
   "devDependencies": {
-    "node-sass": "^7.0.0",
-    "sassy-datepicker": "^0.6.1"
+    "node-sass": "^7.0.0"
   }
 }
