@@ -137,7 +137,7 @@ const ProjectPage = (props) => {
               <span>{`Desea realmente eliminar el proyecto: ${modalDeleteProject.name}?`}</span>
             </p>
             <p>
-              <span>{`Recuerde que esta accion es irreversible`}</span>
+              <span>{`Recuerde que esta acción es irreversible`}</span>
             </p>
           </Modal.Body>
           <Modal.Footer>
