@@ -28,8 +28,8 @@ class Breadcrumbs extends Component {
         this.crumbs_items = crumbs.map(({ name, path }, index) => (
             path === props.location.pathname ?
             <BreadcrumbItem key={index} active>{name}</BreadcrumbItem> :
-            <BreadcrumbItem key={index}>
-                <Link to={path}>{name}</Link>
+            <BreadcrumbItem key={index} href={path}>
+                {name}
             </BreadcrumbItem>
         ));
 
