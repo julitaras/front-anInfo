@@ -3,30 +3,36 @@ import Header from "../Header";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
-import Breadcrumbs from "../Breadcrumbs";
-import axios from "axios";
-import ProjectForm from "../form/ProjectForm";
+import ProjectService from "../../service/ProjectService";
+
+//STYLES
 import "../../styles/projects.css";
 
+//IMPORT COMPONENTS
 import { faPlusSquare, faList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Col,
-  Container,
-  Row,
-  Alert,
-  Card,
-  Button,
-  Modal,
-} from "react-bootstrap";
+import { Container, Card, Button, Modal } from "react-bootstrap";
 import { Input, Label } from "reactstrap";
+import Breadcrumbs from "../Breadcrumbs";
+import ProjectForm from "../form/ProjectForm";
 
 const path = "https://squad14-2c-2021.herokuapp.com";
 
 const ProjectPage = (props) => {
+  useLayoutEffect(() => {
+    ProjectService.getProjects()
+      .then((res) => setProjects({ active: res.data, all: res.data }))
+      .catch((err) => console.error(err));
+  }, []);
+
   const [projects, setProjects] = useState({
     active: [],
     all: [],
+  });
+  const [modalDeleteProject, setDeleteProjectModal] = useState({
+    is_open: false,
+    name: "",
+    id: -1,
   });
   const [modalCreateProjectIsOpen, setCreateProjectModalIsOpen] =
     useState(false);
@@ -43,16 +49,36 @@ const ProjectPage = (props) => {
     const projectsFilter = projects?.all?.filter((project) =>
       project.name.toLowerCase().includes(e.target.value.toLowerCase())
     );
-    console.log(projectsFilter);
     setProjects({ ...projects, active: projectsFilter });
   };
 
-  useLayoutEffect(() => {
-    axios
-      .get(`${path}/projects`)
-      .then((res) => setProjects({ active: res.data, all: res.data }))
+  const openDeleteProjectModalHandler = (name, id) => {
+    setDeleteProjectModal({
+      is_open: true,
+      name: name,
+      id: id,
+    });
+  };
+
+  const closeDeleteProjectModalHandler = () => {
+    setDeleteProjectModal({
+      is_open: false,
+      name: "",
+      id: -1,
+    });
+  };
+
+  const deleteProject = (id) => {
+    ProjectService.deleteProject(id)
+      .then((res) => {
+        ProjectService.getProjects()
+          .then((res) => setProjects({ active: res.data, all: res.data }))
+          .catch((err) => console.error(err));
+      })
       .catch((err) => console.error(err));
-  }, []);
+
+    closeDeleteProjectModalHandler();
+  };
 
   return (
     <>
@@ -81,8 +107,42 @@ const ProjectPage = (props) => {
             <Modal.Title>Crear Proyecto</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ProjectForm />
+            <ProjectForm
+              closeCreateProjectModalHandler={closeCreateProjectModalHandler}
+              setProjects={setProjects}
+            />
           </Modal.Body>
+        </Modal>
+
+        <Modal
+          show={modalDeleteProject.is_open}
+          onHide={closeDeleteProjectModalHandler}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{`Eliminar ${modalDeleteProject.name}`}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              <span>{`Desea realmente eliminar el proyecto: ${modalDeleteProject.name}?`}</span>
+            </p>
+            <p>
+              <span>{`Recuerde que esta accion es irreversible`}</span>
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              onClick={closeDeleteProjectModalHandler}
+              variant="secondary"
+            >
+              Close
+            </Button>
+            <Button
+              onClick={() => deleteProject(modalDeleteProject.id)}
+              variant="danger"
+            >
+              Eliminar
+            </Button>
+          </Modal.Footer>
         </Modal>
       </Container>
 
@@ -118,7 +178,14 @@ const ProjectPage = (props) => {
                   <Button href={`/projects/${project.id}`} variant="primary">
                     Ver Proyecto
                   </Button>
-                  <Button variant="danger">Eliminar Proyecto</Button>
+                  <Button
+                    variant="danger"
+                    onClick={() =>
+                      openDeleteProjectModalHandler(project.name, project.id)
+                    }
+                  >
+                    Eliminar Proyecto
+                  </Button>
                 </div>
               </Card.Body>
             </Card>

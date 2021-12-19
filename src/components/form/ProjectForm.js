@@ -5,7 +5,7 @@ import withLocation from "../../hoc/withLocation";
 import { Form, FormGroup, Input, Label } from "reactstrap";
 import { Breadcrumb, Container, Modal, Button } from "react-bootstrap";
 
-import axios from "axios";
+import ProjectService from "../../service/ProjectService";
 
 const path = "https://squad14-2c-2021.herokuapp.com";
 const initialValue = {
@@ -19,6 +19,7 @@ const initialValue = {
 };
 
 const ProjectForm = (props) => {
+  const { closeCreateProjectModalHandler, setProjects } = props;
   const [values, setValues] = useState(initialValue);
 
   const setValuesHandler = (e) => {
@@ -27,20 +28,16 @@ const ProjectForm = (props) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(values);
 
-    axios
-      .post(`${path}/projects`, {
-        name: values.name,
-        description: values.description,
-        leader: values.leader,
-        state: values.state,
-        start_date: new Date(values.start_date),
-        finish_date: new Date(values.finish_date),
-        worked_hours: 0,
-      })
-      .then((res) => console.log(res.data))
+    ProjectService.createProject(values)
+      .then((res) =>
+        ProjectService.getProjects()
+          .then((res) => setProjects({ active: res.data, all: res.data }))
+          .catch((err) => console.error(err))
+      )
       .catch((err) => console.error(err));
+
+    closeCreateProjectModalHandler();
   };
 
   return (
