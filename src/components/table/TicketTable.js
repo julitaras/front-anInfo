@@ -19,6 +19,7 @@ import Breadcrumbs from "../Breadcrumbs";
 import moment from "moment";
 import EditTicketForm from "../form/EditTicketForm";
 import ProductService from "../../service/ProductService";
+import productService from "../../service/ProductService";
 
 class TicketTable extends Component {
 
@@ -36,7 +37,7 @@ class TicketTable extends Component {
             products: [],
             versions: [],
             actualProductID: undefined,
-            onlyOutOfTime: false
+            onlyOutOfTime: false,
         }
         this.closeEditModal = this.closeEditModal.bind(this);
         this.openEditModal = this.openEditModal.bind(this);
@@ -45,11 +46,12 @@ class TicketTable extends Component {
         this.toggleShowFilters = this.toggleShowFilters.bind(this);
     }
 
-    reloadVersions(productIDStr){
+    reloadVersions(productIDStr) {
         const productService = new ProductService();
         productService.getProduct(parseInt(productIDStr)).then(response => {
             this.setState({
-                versions: response.versions
+                versions: response.versions,
+                produtName: response.name
             });
             console.log(this.state.versions);
         });
@@ -167,6 +169,10 @@ class TicketTable extends Component {
 
     render() {
         //console.log(this.state);
+        console.log(this.state.products.filter((product) => {
+            return product.id === 1;
+        })[0]?.name);
+
         const overlayForm = 
             <Overlay
                 show={this.state.showFilters}
@@ -241,6 +247,7 @@ class TicketTable extends Component {
                     <tbody>
                     {this.state.tickets.map(ticket =>
                         <React.Fragment key={ticket.ticketID}>
+
                             <tr>
                                 <td>{ticket.subject}</td>
                                 <td>{ticket.severity}</td>
@@ -259,7 +266,9 @@ class TicketTable extends Component {
                                     }
                                 <td>
                                     <Container>
-                                        <Button href={`/tickets/${this.props.params.name}/${this.props.params.version}/${ticket.ticketID}`} 
+                                        <Button href={`/tickets/${this.state.products.filter((product) => {
+                                            return product.id === ticket.productID;
+                                        })[0]?.name}/${ticket.productVersion}/${ticket.ticketID}`}
                                                 value={"pruebaDetalle"}
                                                 variant="outline-success" size="sm" >
                                             <FontAwesomeIcon icon={faPlusSquare}/> Ver detalle
