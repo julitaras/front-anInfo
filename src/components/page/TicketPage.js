@@ -8,6 +8,7 @@ import withNavigate from "../../hoc/withNavigate";
 import {Container, Breadcrumb, Badge, Row, Col, ListGroup, Modal, Button} from "react-bootstrap";
 import moment from "moment";
 import ClientService from "../../service/ClientService";
+import EditTicketForm from "../form/EditTicketForm";
 
 class TicketPage extends Component {
 
@@ -15,11 +16,15 @@ class TicketPage extends Component {
         super(props);
         this.state = {
             data: {},
-            clientName: ""
+            clientName: "",
+            editModalIsOpen: false,
+            deleteModalIsOpen: false
         };
         console.log(this.props);
-        this.closeModal = this.closeModal.bind(this);
-        this.openModal = this.openModal.bind(this);
+        this.closeEditModal = this.closeEditModal.bind(this);
+        this.openEditModal = this.openEditModal.bind(this);
+        this.closeDeleteModal = this.closeDeleteModal.bind(this);
+        this.openDeleteModal = this.openDeleteModal.bind(this);
         this.deleteTicket = this.deleteTicket.bind(this);
     }
 
@@ -45,12 +50,20 @@ class TicketPage extends Component {
         });
     }
 
-    openModal = (value) => {
-        this.setState({modalIsOpen: true});
+    openEditModal = (value) => {
+        this.setState({editModalIsOpen: true});
     }
 
-    closeModal = () => {
-        this.setState({modalIsOpen: false});
+    closeEditModal = () => {
+        this.setState({editModalIsOpen: false});
+    }
+
+    openDeleteModal = (value) => {
+        this.setState({deleteModalIsOpen: true});
+    }
+
+    closeDeleteModal = () => {
+        this.setState({deleteModalIsOpen: false});
     }
 
     deleteTicket() {
@@ -75,7 +88,7 @@ class TicketPage extends Component {
     render() {
         return (
             <Container>
-                <Modal size="lg" show={this.state.modalIsOpen} onHide={this.closeModal}>
+                <Modal size="lg" show={this.state.deleteModalIsOpen} onHide={this.closeDeleteModal}>
                     <Modal.Header closeButton>
                     <Modal.Title>Eliminar ticket <small><small><small>
                                     {`(#${this.state.data.ticketID})`}
@@ -85,9 +98,19 @@ class TicketPage extends Component {
                             Está seguro/a de que desea eliminar el ticket?
                         </Modal.Body>
                         <Modal.Footer>
-                        <Button onClick={this.closeModal} variant="secondary">Cancelar</Button>
+                        <Button onClick={this.closeDeleteModal} variant="secondary">Cancelar</Button>
                         <Button onClick={this.deleteTicket} variant="danger">Eliminar</Button>
                     </Modal.Footer>
+                </Modal>
+                <Modal size="lg" show={this.state.editModalIsOpen} onHide={this.closeEditModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Editar ticket <small><small><small>
+                                        {`(#${this.state.data.ticketID})`}
+                                    </small></small></small></Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <EditTicketForm params={{ticketID: this.state.data.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.data.ticketID }}/>
+                    </Modal.Body>
                 </Modal>
                 <Header {...this.props} />
                 <Container>
@@ -106,8 +129,10 @@ class TicketPage extends Component {
                                 Ticket #{this.state.data.ticketID} <Badge bg="secondary">{this.state.data.state}</Badge>
                             </h2>
                         </Col>
-                        <Col xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
-                            <Button onClick={this.openModal} variant="danger">Eliminar Ticket</Button>
+                        <Col xs={4} sm={4} md={4} lg={4} xl={4} xxl={4}>
+                            <Button variant="success">Crear tarea</Button> {'   '}
+                            <Button onClick={this.openEditModal} variant="primary">Editar Ticket</Button> {'   '}
+                            <Button onClick={this.openDeleteModal} variant="danger">Eliminar Ticket</Button>
                         </Col>
                     </Row>
                     
