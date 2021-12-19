@@ -120,7 +120,7 @@ const ProjectForm = (props) => {
             <FormGroup show={type == "edit"}>
               <Label for="workedHours">Horas Trabajadas</Label>
               <Input
-                type="text"
+                type="number"
                 name="worked_hours"
                 id="workedHours"
                 value={values.worked_hours}

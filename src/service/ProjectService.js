@@ -50,7 +50,7 @@ class ProjectService {
           state: values.state,
           start_date: new Date(values.start_date),
           finish_date: new Date(values.finish_date),
-          worked_hours: 0,
+          worked_hours: parseInt(values.worked_hours),
         })
         .then((res) => resolve(res))
         .catch((err) => reject(err))
