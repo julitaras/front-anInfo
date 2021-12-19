@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "reactstrap";
-import { Button, ButtonGroup, Form } from "react-bootstrap";
+import { Button, ButtonGroup, Modal } from "react-bootstrap";
 import DatePicker from "sassy-datepicker";
 import moment from "moment";
-import Modal from "react-bootstrap/Modal";
-import HoursService from "../../service/HoursService";
-//import Hour from "../model/Hour";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+
+import HourService from "../../service/HourService";
+import HourForm from "../form/HourForm";
 
 function useShowModal(defaultValue = false) {
   const [show, setShow] = useState(defaultValue);
@@ -17,15 +17,34 @@ function useShowModal(defaultValue = false) {
 
 function HoursTable({ hours, setDate, date, updateHours }) {
   const [visible, setVisible] = useState(false);
-  const [hourId, setHourId] = useState(0);
-  const [showDelete, handleOpenDelete, handleCloseDelete] = useShowModal();
-  const [showCreate, handleOpenCreate, handleCloseCreate] = useShowModal();
+  const [hour, setHour] = useState({});
+  const [isDeleteModalVisible, openDeleteModal, closeDeleteModal] =
+    useShowModal();
+  const [isCreateModalVisible, openCreateModal, closeCreateModal] =
+    useShowModal();
+  const [isEditModalVisible, openEditModal, closeEditModal] = useShowModal();
+
+  const deleteButtonHandler = ({ target: { name } }) => {
+    setHour(hours.find(({ id }) => name == id));
+    openDeleteModal();
+  };
+
+  const editButtonHandler = ({ target: { name } }) => {
+    setHour(hours.find(({ id }) => name == id));
+    openEditModal();
+  };
 
   const togglePicker = () => setVisible((v) => !v);
   const handleDateSelect = (newDate) => {
     setDate(newDate);
     setVisible(false);
   };
+
+  const defaultHourValues = {
+    legajo: 102090,
+    fecha: date,
+  };
+
   const table = (
     <div className="HoursTable" style={{ display: "block", padding: 30 }}>
       <div className="container">
@@ -62,7 +81,7 @@ function HoursTable({ hours, setDate, date, updateHours }) {
             Right
           </Button>
         </ButtonGroup>
-        <Button onClick={handleOpenCreate} style={{ marginLeft: 792 }}>
+        <Button onClick={openCreateModal} style={{ marginLeft: 792 }}>
           <FontAwesomeIcon icon={faPlusSquare} />
           Cargar hora
         </Button>
@@ -90,15 +109,18 @@ function HoursTable({ hours, setDate, date, updateHours }) {
                   {hour.nota}
                 </td>
                 <td>
-                  <Button variant="secondary" style={{ margin: 1 }}>
+                  <Button
+                    variant="secondary"
+                    name={hour.id}
+                    onClick={editButtonHandler}
+                    style={{ margin: 1 }}
+                  >
                     Editar
                   </Button>
                   <Button
+                    name={hour.id}
                     variant="secondary"
-                    onClick={() => {
-                      handleOpenDelete();
-                      setHourId(hour.id);
-                    }}
+                    onClick={deleteButtonHandler}
                     style={{ margin: 1 }}
                   >
                     Eliminar
@@ -114,89 +136,56 @@ function HoursTable({ hours, setDate, date, updateHours }) {
   return (
     <div className="HoursList">
       {table}
-      <Deletemodal
-        show={showDelete}
-        handleClose={handleCloseDelete}
-        {...{ hourId, updateHours }}
+      <DeleteModal
+        show={isDeleteModalVisible}
+        closeHandler={closeDeleteModal}
+        {...{ hour, updateHours }}
       />
-      <CreateHourModal
-        show={showCreate}
-        handleClose={handleCloseCreate}
-        {...{ date, updateHours }}
-      />
+      {isCreateModalVisible && (
+        <HourForm
+          show={isCreateModalVisible}
+          closeHandler={closeCreateModal}
+          defaultValues={defaultHourValues}
+          {...{ updateHours }}
+        />
+      )}
+      {isEditModalVisible && (
+        <HourForm
+          show={isEditModalVisible}
+          closeHandler={closeEditModal}
+          defaultValues={hour}
+          edit={true}
+          {...{ updateHours }}
+        />
+      )}
     </div>
   );
 }
 
 export default HoursTable;
 
-function Deletemodal({ show, handleClose, hourId, updateHours }) {
-  const hoursservice = new HoursService();
+function DeleteModal({ show, closeHandler, hour, updateHours }) {
+  const hourService = new HourService();
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={show} onHide={closeHandler}>
       <Modal.Header closeButton>
         <Modal.Title>Modal heading</Modal.Title>
       </Modal.Header>
       <Modal.Body>Desea eliminar esta hora cargada?</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={closeHandler}>
           Cancelar
         </Button>
         <Button
           variant="primary"
           onClick={() => {
-            handleClose();
-            hoursservice.deleteHour(hourId).then(updateHours);
+            closeHandler();
+            hourService.deleteHour(hour.id).then(updateHours);
           }}
         >
           Eliminar
         </Button>
       </Modal.Footer>
-    </Modal>
-  );
-}
-
-function CreateHourModal({ show, handleClose, date, updateHours }) {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const hourObject = Object.fromEntries(new FormData(e.target));
-    hourObject.legajo = 102090;
-    new HoursService().postHour(hourObject).then(updateHours);
-    handleClose();
-  };
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Modal heading</Modal.Title>
-      </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body>
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha</Form.Label>
-            <Form.Control
-              type="date"
-              defaultValue={moment(date).format("YYYY-MM-DD")}
-              name="fecha"
-            />
-            <Form.Group className="mb-3">
-              <Form.Label>Cantidad de horas</Form.Label>
-              <Form.Control name="cantidadDeHoras" />
-            </Form.Group>
-          </Form.Group>
-          <Form.Group className="mb-3" name="">
-            <Form.Label>Nota</Form.Label>
-            <Form.Control name="nota" as="textarea" rows={3} />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button variant="primary" type="submit">
-            Crear
-          </Button>
-        </Modal.Footer>
-      </Form>
     </Modal>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import HoursTable from "../table/HoursTable";
-import HoursService from "../../service/HoursService";
+import HourService from "../../service/HourService";
 import Header from "../Header";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
@@ -13,7 +13,7 @@ function HoursPage(props) {
   const [hours, sethours] = React.useState([]);
 
   const updateHours = () => {
-    new HoursService()
+    new HourService()
       .getHours(102090, moment(date).format("YYYY-MM-DD"))
       .then((response) => sethours(response));
   };
@@ -27,4 +27,5 @@ function HoursPage(props) {
     </div>
   );
 }
+
 export default compose(withParams, withLocation)(HoursPage);
