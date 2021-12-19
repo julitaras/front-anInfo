@@ -37,19 +37,26 @@ const TaskColumnStyles = styled.div`
   min-height: 80vh;
 `;
 
-// const Title = styled.span`
-//   color: #10957d;
-//   background: rgba(16, 149, 125, 0.15);
-//   padding: 2px 10px;
-//   border-radius: 5px;
-//   align-self: flex-start;
-// `;
-
 const Title = styled.h3`
     padding: 0 1rem;
     margin: 1rem 0;
     align-self: flex-start;
 `;
+
+const columnsFromBackend = {
+    [uuidv4()]: {
+      title: 'To-do',
+      items: [],
+    },
+    [uuidv4()]: {
+      title: 'In Progress',
+      items: [],
+    },
+    [uuidv4()]: {
+      title: 'Done',
+      items: [],
+    },
+  };
 
 const ProjectPage = (props) => {
   useLayoutEffect(() => {
@@ -69,6 +76,7 @@ const ProjectPage = (props) => {
       .then((res) => {
         setTasks(res.data);
         setStatus(res.status);
+        setColumns(createBoard(res.data));
       })
       .catch((err) => {
         console.error(err);
@@ -82,23 +90,24 @@ const ProjectPage = (props) => {
   const [project, setProject] = useState({});
   const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
 
-  const columnsFromBackend = {
-    [uuidv4()]: {
-      title: 'To-do',
-      items: tasks,
-    },
-    [uuidv4()]: {
-      title: 'In Progress',
-      items: [],
-    },
-    [uuidv4()]: {
-      title: 'Done',
-      items: [],
-    },
-  };
+  const createBoard = (tasks) => {
+    return {
+        [uuidv4()]: {
+          title: 'To-do',
+          items: tasks,
+        },
+        [uuidv4()]: {
+          title: 'In Progress',
+          items: [],
+        },
+        [uuidv4()]: {
+          title: 'Done',
+          items: [],
+        },
+      }
+  }
 
   const [columns, setColumns] = useState(columnsFromBackend);
-
 const onDragEnd = (result, columns, setColumns) => {
     const { source, destination } = result;
 

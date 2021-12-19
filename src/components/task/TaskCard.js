@@ -29,7 +29,7 @@ const TaskCard = ({ item, index }) => {
     console.log("TAREA LLEGO OK")
     console.log(item)
     return (
-      <Draggable key={item.id} draggableId={item.id} index={index}>
+      <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
         {(provided) => (
           <div
             ref={provided.innerRef}
