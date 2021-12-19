@@ -9,7 +9,13 @@ import ProjectService from "../../service/ProjectService";
 import "../../styles/projects.css";
 
 //IMPORT COMPONENTS
-import { faPlusSquare, faList } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlusSquare,
+  faList,
+  faTrash,
+  faEye,
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, Card, Button, Modal } from "react-bootstrap";
 import { Input, Label } from "reactstrap";
@@ -87,12 +93,17 @@ const ProjectPage = (props) => {
 
       <Container>
         <aside className="project-button-container">
-          <Input
-            style={{ width: "80%" }}
-            type="search"
-            placeholder="Buscar proyectos"
-            onChange={searchHandler}
-          />
+          <div className="input-searchbar">
+            <Label for="searchbar" className="search-icon">
+              <FontAwesomeIcon icon={faSearch} />
+            </Label>
+            <Input
+              type="search"
+              name="searchbar"
+              placeholder="Buscar proyectos"
+              onChange={searchHandler}
+            />
+          </div>
           <Button onClick={openCreateProjectModalHandler} variant="primary">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
@@ -176,7 +187,7 @@ const ProjectPage = (props) => {
                 </Card.Text>
                 <div className="project-card-buttons">
                   <Button href={`/projects/${project.id}`} variant="primary">
-                    Ver Proyecto
+                    <FontAwesomeIcon icon={faEye} /> Ver Proyecto
                   </Button>
                   <Button
                     variant="danger"
@@ -184,7 +195,7 @@ const ProjectPage = (props) => {
                       openDeleteProjectModalHandler(project.name, project.id)
                     }
                   >
-                    Eliminar Proyecto
+                    <FontAwesomeIcon icon={faTrash} />
                   </Button>
                 </div>
               </Card.Body>
