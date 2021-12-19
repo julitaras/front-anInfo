@@ -7,7 +7,7 @@ import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import {Button, Container, Modal} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faList, faPlusSquare} from "@fortawesome/free-solid-svg-icons";
+import {faList, faPlusSquare, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import moment from "moment";
@@ -20,12 +20,52 @@ class TicketTable extends Component {
         super(props);
         this.state = {
             tickets: [],
-            modalIsOpen: false,
+            editModalIsOpen: false,
+            deleteModalIsOpen: false,
             ticketID: 0,
             actualTicket: {}
         }
-        this.closeModal = this.closeModal.bind(this);
-        this.openModal = this.openModal.bind(this);
+        this.closeEditModal = this.closeEditModal.bind(this);
+        this.openEditModal = this.openEditModal.bind(this);
+        this.closeDeleteModal = this.closeDeleteModal.bind(this);
+        this.openDeleteModal = this.openDeleteModal.bind(this);
+    }
+
+    openEditModal = (value) => {
+        this.updateValues(value);
+        this.setState({editModalIsOpen: true});
+    }
+
+    closeEditModal = () => {
+        this.setState({editModalIsOpen: false});
+    }
+
+    openDeleteModal = (value) => {
+        this.updateValues(value);
+        this.setState({deleteModalIsOpen: true});
+    }
+
+    closeDeleteModal = () => {
+        this.setState({deleteModalIsOpen: false});
+    }
+
+    deleteTicket() {
+        
+        const ticketService = new TicketService();
+        console.log(this.state.data.ticketID);
+        ticketService.deleteTicket(this.state.ticketID).then(response => {
+            // Check if the response is success and redirect to home
+            // if not, raise an alert
+            console.log(response);
+            
+            if (response.status === 200) {
+                console.log(this.props);
+                this.props.history("/tickets");
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("Error al eliminar ticket")
+        });
     }
 
     setActualTicket(ticketID) {
@@ -40,16 +80,6 @@ class TicketTable extends Component {
             actualTicket : this.state.tickets.find(ticket => {
                 return ticket.ticketID === parseInt(value);
             })});
-    }
-
-    openModal = (value) => {
-        this.updateValues(value);
-        console.log(this.state.actualTicket);
-        this.setState({modalIsOpen: true});
-    }
-
-    closeModal = () => {
-        this.setState({modalIsOpen: false});
     }
 
     componentDidMount() {
@@ -73,7 +103,7 @@ class TicketTable extends Component {
                         <th>Severidad</th>
                         <th>Empleado asignado</th>
                         <th>Días restantes para vencimiento</th>
-                        <th colSpan="2">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -101,12 +131,17 @@ class TicketTable extends Component {
                                                 value={"pruebaDetalle"}
                                                 variant="outline-success" size="sm" >
                                             <FontAwesomeIcon icon={faPlusSquare}/> Ver detalle
+                                        </Button>{'   '}
+                                        <Button variant="outline-primary" size="sm"
+                                            onClick={e => this.openEditModal(e.target.value)}
+                                            value={ ticket.ticketID } >
+                                            <FontAwesomeIcon icon={faList}/> Editar
+                                        </Button>{'   '}
+                                        <Button variant="outline-danger" size="sm"
+                                            onClick={e => this.openDeleteModal(e.target.value)}
+                                            value={ ticket.ticketID } >
+                                            <FontAwesomeIcon icon={faTrash}/> Eliminar
                                         </Button>
-                                            <Button variant="outline-primary" size="sm"
-                                                onClick={e => this.openModal(e.target.value)}
-                                                value={ ticket.ticketID } >
-                                                <FontAwesomeIcon icon={faList}/> Editar
-                                            </Button>
                                     </Container>
                                 </td>
                             </tr>
@@ -117,7 +152,7 @@ class TicketTable extends Component {
                 </Container>
         return (
             <div>
-                <Modal size="lg" show={this.state.modalIsOpen} onHide={this.closeModal}>
+                <Modal size="lg" show={this.state.editModalIsOpen} onHide={this.closeEditModal}>
                     <Modal.Header closeButton>
                     <Modal.Title>Editar ticket <small><small><small>
                                     {`(#${this.state.ticketID})`}
@@ -126,6 +161,20 @@ class TicketTable extends Component {
                         <Modal.Body>
                             <EditTicketForm params={{ticketID: this.state.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.ticketID }}/>
                         </Modal.Body>
+                </Modal>
+                <Modal size="lg" show={this.state.deleteModalIsOpen} onHide={this.closeDeleteModal}>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Eliminar ticket <small><small><small>
+                                    {`(#${this.state.ticketID})`}
+                                </small></small></small></Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            Está seguro/a de que desea eliminar el ticket?
+                        </Modal.Body>
+                        <Modal.Footer>
+                        <Button onClick={this.closeDeleteModal} variant="secondary">Cancelar</Button>
+                        <Button onClick={this.deleteTicket} variant="danger">Eliminar</Button>
+                    </Modal.Footer>
                 </Modal>
                 <Header Header={"hola"} {...this.props} />
                 <Breadcrumbs {...this.props} />
