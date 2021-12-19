@@ -11,12 +11,7 @@ import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  useParams,
-} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const TaskContainer = styled.div`
   display: flex;
@@ -31,9 +26,10 @@ const ProjectPage = (props) => {
       })
       .catch((err) => {
         console.error(err);
+        setStatus(0);
       });
   }, []);
-  const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState();
   const { id } = useParams();
   const [project, setProject] = useState({});
 
@@ -167,7 +163,7 @@ const ProjectPage = (props) => {
           </DragDropContext>
         </>
       )}
-      {status != 200 && (
+      {status == 0 && (
         <div className="d-flex flex-column align-items-center justify-content-center">
           <h1>Error 404</h1>
           <h3>No se encontro el proyecto.</h3>

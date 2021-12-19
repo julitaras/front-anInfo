@@ -13,14 +13,13 @@ class ProjectService {
     }
   }
 
-  static async getProject(id) {
-    try {
-      const response = await axios.get(`${PATH}/projects/${id}`);
-      return response;
-    } catch (err) {
-      console.error(err);
-      return err;
-    }
+  static getProject(id) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`${PATH}/projects/${id}`)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err))
+    );
   }
 
   static async createProject(values) {
