@@ -22,8 +22,6 @@ import { Input, Label } from "reactstrap";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectForm from "../form/ProjectForm";
 
-const path = "https://squad14-2c-2021.herokuapp.com";
-
 const ProjectPage = (props) => {
   useLayoutEffect(() => {
     ProjectService.getProjects()

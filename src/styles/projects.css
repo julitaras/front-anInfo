@@ -41,3 +41,13 @@
   display: flex;
   justify-content: space-between;
 }
+
+.info-layer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.info-project {
+  padding-bottom: 1ch;
+}
