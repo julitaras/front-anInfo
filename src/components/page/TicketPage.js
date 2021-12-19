@@ -3,7 +3,8 @@ import TicketService from "../../service/TicketService";
 import Header from "../Header";
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
-import withLocation from "../../hoc/withLocation"
+import withLocation from "../../hoc/withLocation";
+import withNavigate from "../../hoc/withNavigate";
 import {Container, Breadcrumb, Badge, Row, Col, ListGroup, Modal, Button} from "react-bootstrap";
 import moment from "moment";
 import ClientService from "../../service/ClientService";
@@ -56,14 +57,14 @@ class TicketPage extends Component {
         
         const ticketService = new TicketService();
         console.log(this.state.data.ticketID);
-        ticketService.postTicket(this.state.data.ticketID).then(response => {
+        ticketService.deleteTicket(this.state.data.ticketID).then(response => {
             // Check if the response is success and redirect to home
             // if not, raise an alert
             console.log(response);
             
             if (response.status === 200) {
                 console.log(this.props);
-                //this.props.history("/tickets");
+                this.props.history("/tickets");
             }
         }).catch(error => {
             console.log(error);
@@ -161,4 +162,4 @@ class TicketPage extends Component {
 };
 
 export default compose(withParams,
-withLocation) (TicketPage);
+withLocation, withNavigate) (TicketPage);
