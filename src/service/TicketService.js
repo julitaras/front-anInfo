@@ -19,6 +19,11 @@ class ProductService {
         console.log(response);
         return response; 
     }
+
+    async deleteTicket(ticketID) {
+        const response = await axios.delete(`https://soporte-fiuba.herokuapp.com/tickets/${ticketID}`);
+        return response;
+    }
 };
 
 export default ProductService;

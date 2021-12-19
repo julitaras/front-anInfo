@@ -4,8 +4,7 @@ import Header from "../Header";
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation"
-import Breadcrumbs from "../Breadcrumbs";
-import {Container, Breadcrumb, Badge, Row, Col, ListGroup} from "react-bootstrap";
+import {Container, Breadcrumb, Badge, Row, Col, ListGroup, Modal, Button} from "react-bootstrap";
 import moment from "moment";
 import ClientService from "../../service/ClientService";
 
@@ -17,6 +16,10 @@ class TicketPage extends Component {
             data: {},
             clientName: ""
         };
+        console.log(this.props);
+        this.closeModal = this.closeModal.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.deleteTicket = this.deleteTicket.bind(this);
     }
 
     componentDidMount() {
@@ -26,8 +29,6 @@ class TicketPage extends Component {
                 {
                     data: response.data
                 })
-            console.log(this.state.data);
-            console.log(moment(this.state.data.createdDate));
             this.getClientName(this.state.data.clientID);
         });
         
@@ -43,9 +44,50 @@ class TicketPage extends Component {
         });
     }
 
+    openModal = (value) => {
+        this.setState({modalIsOpen: true});
+    }
+
+    closeModal = () => {
+        this.setState({modalIsOpen: false});
+    }
+
+    deleteTicket() {
+        
+        const ticketService = new TicketService();
+        console.log(this.state.data.ticketID);
+        ticketService.postTicket(this.state.data.ticketID).then(response => {
+            // Check if the response is success and redirect to home
+            // if not, raise an alert
+            console.log(response);
+            
+            if (response.status === 200) {
+                console.log(this.props);
+                //this.props.history("/tickets");
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("Error al eliminar ticket")
+        });
+    }
+
     render() {
         return (
             <Container>
+                <Modal size="lg" show={this.state.modalIsOpen} onHide={this.closeModal}>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Eliminar ticket <small><small><small>
+                                    {`(#${this.state.data.ticketID})`}
+                                </small></small></small></Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            Está seguro/a de que desea eliminar el ticket?
+                        </Modal.Body>
+                        <Modal.Footer>
+                        <Button onClick={this.closeModal} variant="secondary">Cancelar</Button>
+                        <Button onClick={this.deleteTicket} variant="danger">Eliminar</Button>
+                    </Modal.Footer>
+                </Modal>
                 <Header {...this.props} />
                 <Container>
                     <Breadcrumb>
@@ -57,9 +99,18 @@ class TicketPage extends Component {
                     </Breadcrumb>
                 </Container>
                 <Container>
-                    <h2>
-                        Ticket #{this.state.data.ticketID} <Badge bg="secondary">{this.state.data.state}</Badge>
-                    </h2>
+                    <Row>
+                        <Col>
+                            <h2>
+                                Ticket #{this.state.data.ticketID} <Badge bg="secondary">{this.state.data.state}</Badge>
+                            </h2>
+                        </Col>
+                        <Col xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
+                            <Button onClick={this.openModal} variant="danger">Eliminar Ticket</Button>
+                        </Col>
+                    </Row>
+                    
+                    
                 </Container>
                 <Container>
                     <Row>
