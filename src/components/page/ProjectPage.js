@@ -94,15 +94,15 @@ const ProjectPage = (props) => {
     return {
         [uuidv4()]: {
           title: 'To-do',
-          items: tasks,
+          items: tasks.filter((task) => task.state.includes("TODO")),
         },
         [uuidv4()]: {
           title: 'In Progress',
-          items: [],
+          items: tasks.filter((task) => task.state.includes("IN_PROGRESS")),
         },
         [uuidv4()]: {
           title: 'Done',
-          items: [],
+          items: tasks.filter((task) => task.state.includes("DONE")),
         },
       }
   }
