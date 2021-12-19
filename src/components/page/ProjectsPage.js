@@ -168,7 +168,9 @@ const ProjectPage = (props) => {
                 <Card.Text>
                   <div className="project-card-content">
                     <div className="project-card-state">
-                      <p>Estado: {project.state}</p>
+                      <p>
+                        Estado: {project.state ? project.state : "Sin estado"}
+                      </p>
                     </div>
                     <div className="project-card-dates">
                       <p>
