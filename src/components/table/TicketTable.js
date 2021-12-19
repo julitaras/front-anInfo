@@ -5,12 +5,14 @@ import TicketService from "../../service/TicketService";
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
-import {Button, Container} from "react-bootstrap";
+import {Button, Container, Modal} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faList, faPlusSquare} from "@fortawesome/free-solid-svg-icons";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import moment from "moment";
+import TicketForm from "../form/TicketForm";
+import EditTicketForm from "../form/EditTicketForm";
 
 class TicketTable extends Component {
 
@@ -18,9 +20,37 @@ class TicketTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tickets: []
+            tickets: [],
+            modalIsOpen: false,
+            ticketID: 0,
+            actualTicket: {}
         }
-        console.log(this.props);
+        this.closeModal = this.closeModal.bind(this);
+        this.openModal = this.openModal.bind(this);
+    }
+
+    setActualTicket(ticketID) {
+        console.log(ticketID);
+        this.setState({actualTicket : this.state.tickets.find(ticket => {
+            return ticket.ticketID === ticketID;
+        })});
+    }
+
+    updateValues(value) {
+        this.setState({ticketID: parseInt(value),
+            actualTicket : this.state.tickets.find(ticket => {
+                return ticket.ticketID === parseInt(value);
+            })});
+    }
+
+    openModal = (value) => {
+        this.updateValues(value);
+        console.log(this.state.actualTicket);
+        this.setState({modalIsOpen: true});
+    }
+
+    closeModal = () => {
+        this.setState({modalIsOpen: false});
     }
 
     componentDidMount() {
@@ -30,7 +60,6 @@ class TicketTable extends Component {
                 {
                     tickets: response.data
                 })
-            console.log(this.state.tickets)
         });
     }
 
@@ -50,7 +79,7 @@ class TicketTable extends Component {
                     </thead>
                     <tbody>
                     {this.state.tickets.map(ticket =>
-                        <React.Fragment key={ticket.id}>
+                        <React.Fragment key={ticket.ticketID}>
                             <tr>
                                 <td>{ticket.subject}</td>
                                 <td>{ticket.severity}</td>
@@ -74,7 +103,9 @@ class TicketTable extends Component {
                                                 variant="outline-success" size="sm" >
                                             <FontAwesomeIcon icon={faPlusSquare}/> Ver detalle
                                         </Button>
-                                            <Button variant="outline-primary" size="sm">
+                                            <Button variant="outline-primary" size="sm"
+                                                onClick={e => this.openModal(e.target.value)}
+                                                value={ ticket.ticketID } >
                                                 <FontAwesomeIcon icon={faList}/> Editar
                                             </Button>
                                     </Container>
@@ -87,6 +118,16 @@ class TicketTable extends Component {
                 </Container>
         return (
             <div>
+                <Modal size="lg" show={this.state.modalIsOpen} onHide={this.closeModal}>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Editar ticket <small><small><small>
+                                    {`(#${this.state.ticketID})`}
+                                </small></small></small></Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <EditTicketForm params={{ticketID: this.state.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.ticketID }}/>
+                        </Modal.Body>
+                </Modal>
                 <Header Header={"hola"} {...this.props} />
                 <Breadcrumbs {...this.props} />
                 {table}

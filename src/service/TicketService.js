@@ -13,6 +13,12 @@ class ProductService {
         const response = await axios.get(`https://soporte-fiuba.herokuapp.com${query}`);
         return response;
     }
+
+    async updateTicket(ticketID, ticketObject) {
+        const response = await axios.put(`https://soporte-fiuba.herokuapp.com/tickets/${ticketID}`, ticketObject);
+        console.log(response);
+        return response; 
+    }
 };
 
 export default ProductService;

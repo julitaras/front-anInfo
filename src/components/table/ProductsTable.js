@@ -124,7 +124,7 @@ class ProductsTable extends Component {
                     </small></small></small></Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <TicketForm params={{name: this.state.productName, version: this.state.productVersion, productID: this.state.productID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID }}/>
+                <TicketForm params={{name: this.state.productName, version: this.state.productVersion, productID: this.state.productID, editionMode: false}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID }}/>
             </Modal.Body>
         </Modal>
             <div className="ProductList">
