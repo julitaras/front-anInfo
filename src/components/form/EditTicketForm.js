@@ -278,7 +278,7 @@ class EditTicketForm extends Component {
                         </Input>
                     </FormGroup>
 
-                    <Button>Crear Ticket</Button>
+                    <Button>Guardar cambios</Button>
                 </Form>
             </div>
             </Container>
