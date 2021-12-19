@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
@@ -7,7 +7,6 @@ import { Breadcrumb, Container, Modal, Button } from "react-bootstrap";
 
 import ProjectService from "../../service/ProjectService";
 
-const path = "https://squad14-2c-2021.herokuapp.com";
 const initialValue = {
   name: "",
   description: "",
@@ -19,25 +18,40 @@ const initialValue = {
 };
 
 const ProjectForm = (props) => {
-  const { closeCreateProjectModalHandler, setProjects } = props;
-  const [values, setValues] = useState(initialValue);
-
+  const { closeModalHandler, setProjects, type, project } = props;
+  const [values, setValues] = useState(
+    !project
+      ? initialValue
+      : {
+          ...project,
+          start_date: new Date(project.start_date).toLocaleDateString("fr-CA"),
+          finish_date: new Date(project.finish_date).toLocaleDateString(
+            "fr-CA"
+          ),
+        }
+  );
   const setValuesHandler = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (type === "create") {
+      ProjectService.createProject(values)
+        .then((res) =>
+          ProjectService.getProjects()
+            .then((res) => setProjects({ active: res.data, all: res.data }))
+            .catch((err) => console.error(err))
+        )
+        .catch((err) => console.error(err));
+    } else {
+      ProjectService.editProject(values)
+        .then((res) => window.location.reload())
+        .catch((err) => console.error(err));
+      console.log(values);
+    }
 
-    ProjectService.createProject(values)
-      .then((res) =>
-        ProjectService.getProjects()
-          .then((res) => setProjects({ active: res.data, all: res.data }))
-          .catch((err) => console.error(err))
-      )
-      .catch((err) => console.error(err));
-
-    closeCreateProjectModalHandler();
+    closeModalHandler();
   };
 
   return (
@@ -97,7 +111,7 @@ const ProjectForm = (props) => {
             >
               <option value="">Ingrese un valor</option>
               <option value="TODO">TODO</option>
-              <option value="IN PROGRES">IN PROGRESS</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
               <option value="DONE">DONE</option>
             </Input>
           </FormGroup>
@@ -110,7 +124,7 @@ const ProjectForm = (props) => {
               type="date"
               name="start_date"
               id="startDate"
-              value={values.startDate}
+              value={values.start_date}
               onChange={setValuesHandler}
               required
             />
@@ -124,7 +138,7 @@ const ProjectForm = (props) => {
               type="date"
               name="finish_date"
               id="finishDate"
-              value={values.finishDate}
+              value={values.finish_date}
               onChange={setValuesHandler}
               required
             />
@@ -134,7 +148,7 @@ const ProjectForm = (props) => {
           </p>
           <Modal.Footer>
             <Button type="submit" variant="primary">
-              Crear Proyecto
+              {type == "crear" ? "Crear Proyecto" : "Guardar Proyecto"}
             </Button>
           </Modal.Footer>
         </Form>

@@ -6,12 +6,13 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { compose } from "redux";
-import { Container, Accordion, Card, Button } from "react-bootstrap";
+import { Container, Accordion, Card, Button, Modal } from "react-bootstrap";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import ProjectForm from "../form/ProjectForm";
 
 import { useParams } from "react-router-dom";
 
@@ -116,6 +117,16 @@ const ProjectPage = (props) => {
     setData(newState);
   };
 
+  const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
+
+  const openEditProjectModalHandler = () => {
+    setEditProjectModalIsOpen(true);
+  };
+
+  const closeEditProjectModalHandler = () => {
+    setEditProjectModalIsOpen(false);
+  };
+
   return (
     <Container>
       <Header {...props} />
@@ -123,6 +134,23 @@ const ProjectPage = (props) => {
       {status == 200 && (
         <>
           <Container>
+            <Modal
+              size="lg"
+              show={modalEditProjectIsOpen}
+              onHide={closeEditProjectModalHandler}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Editar Proyecto</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <ProjectForm
+                  closeModalHandler={closeEditProjectModalHandler}
+                  type="edit"
+                  project={project}
+                />
+              </Modal.Body>
+            </Modal>
+
             <Accordion defaultActiveKey="0">
               <Accordion.Item eventKey="0">
                 <Accordion.Header>
@@ -212,7 +240,10 @@ const ProjectPage = (props) => {
                       </Card>
                     </div>
                   </div>
-                  <Button variant="primary">
+                  <Button
+                    onClick={openEditProjectModalHandler}
+                    variant="primary"
+                  >
                     <FontAwesomeIcon icon={faEdit} /> Editar Proyecto
                   </Button>
                 </Accordion.Body>

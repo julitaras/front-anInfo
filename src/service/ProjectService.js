@@ -13,15 +13,6 @@ class ProjectService {
     }
   }
 
-  static getProject(id) {
-    return new Promise((resolve, reject) =>
-      axios
-        .get(`${PATH}/projects/${id}`)
-        .then((res) => resolve(res))
-        .catch((err) => reject(err))
-    );
-  }
-
   static async createProject(values) {
     try {
       const response = await axios.post(`${PATH}/projects`, {
@@ -38,6 +29,32 @@ class ProjectService {
       console.error(err);
       return err;
     }
+  }
+
+  static getProject(id) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`${PATH}/projects/${id}`)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err))
+    );
+  }
+
+  static editProject(values) {
+    return new Promise((resolve, reject) =>
+      axios
+        .put(`${PATH}/projects/${values.id}`, {
+          name: values.name,
+          description: values.description,
+          leader: values.leader,
+          state: values.state,
+          start_date: new Date(values.start_date),
+          finish_date: new Date(values.finish_date),
+          worked_hours: 0,
+        })
+        .then((res) => resolve(res))
+        .catch((err) => reject(err))
+    );
   }
 
   static async deleteProject(id) {

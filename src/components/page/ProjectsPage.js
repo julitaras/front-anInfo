@@ -117,8 +117,9 @@ const ProjectPage = (props) => {
           </Modal.Header>
           <Modal.Body>
             <ProjectForm
-              closeCreateProjectModalHandler={closeCreateProjectModalHandler}
+              closeModalHandler={closeCreateProjectModalHandler}
               setProjects={setProjects}
+              type="create"
             />
           </Modal.Body>
         </Modal>
