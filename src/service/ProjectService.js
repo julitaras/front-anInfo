@@ -13,6 +13,16 @@ class ProjectService {
     }
   }
 
+  static async getProject(id) {
+    try {
+      const response = await axios.get(`${PATH}/projects/${id}`);
+      return response;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+  }
+
   static async createProject(values) {
     try {
       const response = await axios.post(`${PATH}/projects`, {
