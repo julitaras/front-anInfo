@@ -66,6 +66,15 @@ class ProjectService {
       return err;
     }
   }
+
+  static async getTasksByProjectId(id) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`${PATH}/tasks?project_id=${id}`)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err))
+    );
+  }
 }
 
 export default ProjectService;
