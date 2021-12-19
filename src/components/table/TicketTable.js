@@ -5,13 +5,20 @@ import TicketService from "../../service/TicketService";
 import {compose} from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
-import {Button, Container, Modal} from "react-bootstrap";
+import {Button, Container, Modal, Overlay, Popover, Row, Col} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faList, faPlusSquare, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {
+    Form,
+    FormGroup,
+    Input,
+    Label
+  } from 'reactstrap';
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import moment from "moment";
 import EditTicketForm from "../form/EditTicketForm";
+import ProductService from "../../service/ProductService";
 
 class TicketTable extends Component {
 
@@ -23,12 +30,29 @@ class TicketTable extends Component {
             editModalIsOpen: false,
             deleteModalIsOpen: false,
             ticketID: 0,
-            actualTicket: {}
+            actualTicket: {}, 
+            showFilters: false,
+            target: null,
+            products: [],
+            versions: [],
+            actualProductID: undefined,
+            onlyOutOfTime: false
         }
         this.closeEditModal = this.closeEditModal.bind(this);
         this.openEditModal = this.openEditModal.bind(this);
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
         this.openDeleteModal = this.openDeleteModal.bind(this);
+        this.toggleShowFilters = this.toggleShowFilters.bind(this);
+    }
+
+    reloadVersions(productIDStr){
+        const productService = new ProductService();
+        productService.getProduct(parseInt(productIDStr)).then(response => {
+            this.setState({
+                versions: response.versions
+            });
+            console.log(this.state.versions);
+        });
     }
 
     openEditModal = (value) => {
@@ -84,16 +108,124 @@ class TicketTable extends Component {
 
     componentDidMount() {
         const ticketService = new TicketService();
+        console.log(this.props.location.search);
         ticketService.getTickets(`/tickets${this.props.location.search}`).then(response => {
             this.setState(
                 {
                     tickets: response.data
                 })
         });
+        const productService = new ProductService();
+        productService.getProducts().then(response =>
+            this.setState({
+                products: response
+            })
+        );
+
+    }
+
+    toggleShowFilters(e) {
+        this.setState(
+            {showFilters : !this.state.showFilters,
+            target: e.target})
+    }
+
+    filterTickets(e) {
+        const formData = new FormData(e.target);
+        e.preventDefault();
+        console.log(formData.entries());
+        var ticket = {};
+        for (let [key, value] of formData.entries()) {
+            ticket[key] = value;
+        }
+        if (this.state.onlyOutOfTime)
+            ticket['outOfTime'] = this.state.onlyOutOfTime;
+        if (ticket.productID === '')
+            delete ticket.productID
+        else
+            ticket['productID'] = parseInt(ticket['productID'])
+        if (ticket.productVersion === '')
+            delete ticket.productVersion
+        if (ticket.type === '')
+            delete ticket.type
+        var str = [];
+        for (var p in ticket)
+            if (ticket.hasOwnProperty(p)) {
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(ticket[p]));
+            }
+        var query = str.join("&");
+
+        const ticketService = new TicketService();
+        ticketService.getTickets(`/tickets?${query}`).then(response => {
+            this.setState(
+                {
+                    tickets: response.data
+                })
+        });
+
     }
 
     render() {
         //console.log(this.state);
+        const overlayForm = 
+            <Overlay
+                show={this.state.showFilters}
+                placement="bottom"
+                target={this.state.target}
+
+            >
+                <Popover id="popover-contained">
+                <Popover.Body>
+                <Container>
+                    <Form onSubmit={(e) => this.filterTickets(e)}>
+                        <FormGroup>
+                            <Label for="product">Producto</Label>
+                            <Input value={this.state.actualProductID}
+                            onChange={e =>{this.reloadVersions(e.target.value)}}
+                            type="select" name="productID" id="product">
+                                <option value=''>Todos</option>
+                                {this.state.products.map((product) => {
+                                    return (
+                                        <option key={product.id} value={product.id}>{product.name}</option>
+                                    )
+                                })}
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="productVersion">Versión</Label>
+                            <Input type="select" name="productVersion" id="productVersion">
+                                <option value=''>Todas</option>
+                                {this.state.versions.map((version, index) => {
+                                    return (
+                                        <option key={index} value={version}>{version}</option>
+                                    )
+                                })}
+                            </Input>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="type">Tipo</Label>
+                            <Input type="select" name="type" id="type">
+                                <option value=''>Todos</option>
+                                <option value="ERROR">Error</option>
+                                <option value="QUERY">Consulta</option>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup check>
+                            <Input type="checkbox" onChange={e =>{
+                                this.setState({onlyOutOfTime: e.target.checked})
+                            }}/>
+                            {' '}
+                            <Label check>Ver solo tickets vencidos</Label>
+                        </FormGroup>
+                        <Button variant="primary" type="submit">
+                            Filtrar
+                        </Button>
+                    </Form>
+                </Container>
+                </Popover.Body>
+                </Popover>
+            </Overlay>
+                
         const table =
                 <Container>
                 <Table striped bordered hover>
@@ -178,6 +310,19 @@ class TicketTable extends Component {
                 </Modal>
                 <Header Header={"hola"} {...this.props} />
                 <Breadcrumbs {...this.props} />
+                <Container >
+                    <Row>
+                    <Col>{'  '}</Col>
+                    <Col xs={1} sm={1} md={1} lg={1} xl={1} xxl={1}>
+                    <Button onClick={this.toggleShowFilters}>Filtros</Button>
+                    </Col>
+                    {overlayForm}
+                    </Row>
+                    <Row>
+                        {'   '}
+                    </Row>
+                </Container>
+                
                 {table}
             </div>
         );
