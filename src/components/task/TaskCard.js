@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { Button, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import ProjectService from "../../service/ProjectService";
 import TaskForm from "../form/TaskForm";
+import EmployeeService from "../../service/EmployeeService";
+
 const TaskInformation = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,6 +39,7 @@ const TaskCard = ({ item, index, taskReload }) => {
   });
 
   const [modalEditTaskIsOpen, setEditTaskModalIsOpen] = useState(false);
+  const [employee, setEmployee] = useState({});
 
   const openEditTaskModalHandler = () => {
     setEditTaskModalIsOpen(true);
@@ -96,6 +99,9 @@ const TaskCard = ({ item, index, taskReload }) => {
                     timeZone: "UTC",
                   })}
                 </span>
+              </p>
+              <p>
+                <span>Legajo asignado: {item.assigned_to}</span>
               </p>
               <div class="task-buttons">
                 <div>
