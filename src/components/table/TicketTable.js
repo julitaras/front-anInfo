@@ -20,6 +20,7 @@ import moment from "moment";
 import EditTicketForm from "../form/EditTicketForm";
 import ProductService from "../../service/ProductService";
 import productService from "../../service/ProductService";
+import EmployeeService from "../../service/EmployeeService";
 
 class TicketTable extends Component {
 
@@ -36,6 +37,7 @@ class TicketTable extends Component {
             target: null,
             products: [],
             versions: [],
+            employees: [],
             actualProductID: undefined,
             onlyOutOfTime: false,
         }
@@ -124,6 +126,14 @@ class TicketTable extends Component {
             })
         );
 
+        const employeeService = new EmployeeService();
+        employeeService.getEmployees().then(response => {
+            this.setState(
+                {
+                    employees: response.data
+                })
+        });
+
     }
 
     toggleShowFilters(e) {
@@ -167,11 +177,14 @@ class TicketTable extends Component {
 
     }
 
+    employeeFullName(employeeID) {
+       let employee = this.state.employees.filter((employee) => {
+            return employee.legajo === employeeID;
+        })[0];
+        return (employee === undefined ? undefined : `${employee.Nombre} ${employee.Apellido} `);
+    }
+
     render() {
-        //console.log(this.state);
-        console.log(this.state.products.filter((product) => {
-            return product.id === 1;
-        })[0]?.name);
 
         const overlayForm = 
             <Overlay
@@ -251,7 +264,7 @@ class TicketTable extends Component {
                             <tr>
                                 <td>{ticket.subject}</td>
                                 <td>{ticket.severity}</td>
-                                <td>{ticket.employeeID}</td>
+                                <td>{this.employeeFullName(ticket.employeeID)}</td>
                                     {
                                             (() => {
                                             let expectedDate = moment(ticket.expectedDate);
