@@ -101,7 +101,7 @@ const TaskCard = ({ item, index, taskReload }) => {
                 </span>
               </p>
               <p>
-                <span>Legajo asignado: {item.assigned_to}</span>
+                <span>Legajo asignado: {item.assigned_to ? item.assigned_to : "Sin asignado"}</span>
               </p>
               <div class="task-buttons">
                 <div>

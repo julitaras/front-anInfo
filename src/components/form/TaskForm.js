@@ -110,7 +110,7 @@ const TaskForm = (props) => {
               <option value="">Ingrese un legajo</option>
               {employees.map((employee) => (
                 <option value={employee.legajo}>
-                  {employee.legajo} {employee.Nombre}
+                  {employee.legajo} - {employee.Nombre.concat(" ").concat(employee.Apellido)}
                 </option>
               ))}
             </Input>
