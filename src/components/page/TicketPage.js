@@ -94,6 +94,7 @@ class TicketPage extends Component {
 
     closeEditModal = () => {
         this.setState({editModalIsOpen: false});
+        this.loadTicketsAndTasks();
     }
 
     openDeleteModal = (value) => {
@@ -255,7 +256,7 @@ class TicketPage extends Component {
                                     </small></small></small></Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <EditTicketForm params={{ticketID: this.state.data.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.data.ticketID }}/>
+                        <EditTicketForm params={{ticketID: this.state.data.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.data.ticketID, closeModal: this.closeEditModal }}/>
                     </Modal.Body>
                 </Modal>
                 <Header {...this.props} />

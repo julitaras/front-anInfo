@@ -43,6 +43,7 @@ class EditTicketForm extends Component {
             ticketStateValue: "",
             ticketStateName: ""
         };
+        console.log(this.props);
         //this.postTicket = this.postTicket.bind(this);
     }
 
@@ -165,7 +166,7 @@ class EditTicketForm extends Component {
             // Check if the response is success and redirect to home
             // if not, raise an alert
             console.log(response);
-            
+            this.props.state.closeModal();
             
         }).catch(error => {
             console.log(error);

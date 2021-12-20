@@ -23,6 +23,7 @@ class TicketForm extends Component {
             clients: [],
             employees: []
         };
+        console.log(this.props);
         //this.postTicket = this.postTicket.bind(this);
     }
 
@@ -69,11 +70,7 @@ class TicketForm extends Component {
             // Check if the response is success and redirect to home
             // if not, raise an alert
             console.log(response);
-            
-            if (response.status === 200) {
-                console.log(this.props);
-                this.props.history("/products");
-            }
+            this.props.history(`/tickets/${this.props.name}/${this.props.version}/${response.data.ticketID}`);
         }).catch(error => {
             console.log(error);
             alert("Error al crear ticket")

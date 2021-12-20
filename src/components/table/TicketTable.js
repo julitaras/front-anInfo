@@ -313,7 +313,7 @@ class TicketTable extends Component {
                                 </small></small></small></Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <EditTicketForm params={{ticketID: this.state.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.ticketID }}/>
+                            <EditTicketForm params={{ticketID: this.state.ticketID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID, ticketID: this.state.ticketID, closeModal: this.closeEditModal }}/>
                         </Modal.Body>
                 </Modal>
                 <Modal size="lg" show={this.state.deleteModalIsOpen} onHide={this.closeDeleteModal}>
