@@ -59,6 +59,7 @@ const columnsFromBackend = {
 const ProjectPage = (props) => {
   const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState();
+  const [taskStatus, setTaskStatus] = useState();
   const { id } = useParams();
   const [project, setProject] = useState({});
   const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
@@ -85,12 +86,12 @@ const ProjectPage = (props) => {
     ProjectService.getTasksByProjectId(id)
       .then((res) => {
         setTasks(res.data);
-        setStatus(res.status);
+        setTaskStatus(res.status);
         setColumns(createBoard(res.data));
       })
       .catch((err) => {
         console.error(err);
-        setStatus(0);
+        setTaskStatus(0);
       });
   };
 
@@ -407,7 +408,7 @@ const ProjectPage = (props) => {
           </DragDropContext>
         </>
       )}
-      {project && status == 0 && (
+      {project && (status == 0 || taskStatus == 0) && (
         <div className="d-flex flex-column align-items-center justify-content-center">
           <h1>Error 404</h1>
           <h3>No se encontro el proyecto.</h3>
