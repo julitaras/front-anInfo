@@ -76,6 +76,7 @@ export default function HourForm({
           <Form.Group className="mb-3">
             <Form.Label>Fecha</Form.Label>
             <Form.Control
+			  required ="true"
               type="date"
               value={moment(hour.fecha).format("YYYY-MM-DD")}
               name="fecha"
@@ -86,10 +87,11 @@ export default function HourForm({
             <Form.Label>Projecto</Form.Label>
 
             <Form.Select
+			  required ="true"
               value={hour.idProyecto}
               onChange={projectChangeHandler}
             >
-              <option>Seleccione Projecto</option>
+              <option selected disabled value={""}>Seleccione Projecto</option>
               {projects.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
@@ -101,11 +103,12 @@ export default function HourForm({
             <Form.Label>Tarea</Form.Label>
 
             <Form.Select
+			  required ="true"
               name="idTarea"
               value={hour.idTarea}
               onChange={defaultHandler}
             >
-              <option>Seleccione Tarea</option>
+              <option selected disabled value={""}>Seleccione Tarea</option>
               {availableTasks.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
@@ -116,6 +119,7 @@ export default function HourForm({
           <Form.Group className="mb-3">
             <Form.Label>Cantidad de horas</Form.Label>
             <Form.Control
+			  required ="true"
               name="cantidadDeHoras"
               value={hour.cantidadDeHoras || ""}
               onChange={defaultHandler}

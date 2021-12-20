@@ -89,6 +89,7 @@ function HoursTable({ hours, setDate, date, updateHours }) {
       <Table striped bordered hover>
         <thead>
           <tr>
+		    <th>Legajo</th>
             <th>Proyecto</th>
             <th>Tarea</th>
             <th>Cantidad de Horas</th>
@@ -100,8 +101,15 @@ function HoursTable({ hours, setDate, date, updateHours }) {
           {hours.map((hour) => (
             <React.Fragment key={hour.id}>
               <tr>
-                <td>Proyecto</td>
-                <td>Tarea</td>
+                <td align={"center"} valign={"middle"}>
+                  {hour.legajo}
+                </td>
+                <td align={"center"} valign={"middle"}>
+                  {hour.nombreProyecto}
+                </td>
+                <td align={"center"} valign={"middle"}>
+                  {hour.nombreTarea}
+                </td>
                 <td align={"center"} valign={"middle"}>
                   {hour.cantidadDeHoras}
                 </td>
