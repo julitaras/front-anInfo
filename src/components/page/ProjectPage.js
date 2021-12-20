@@ -1,18 +1,10 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { compose } from "redux";
-import {
-  Container,
-  Accordion,
-  Card,
-  Button,
-  Modal,
-  ListGroup,
-  Text,
-} from "react-bootstrap";
+import { Container, Accordion, Card, Button, Modal } from "react-bootstrap";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
@@ -23,6 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 import TaskCard from "../task/TaskCard.js";
 import { useParams } from "react-router-dom";
 import TaskForm from "../form/TaskForm";
+import EmployeeService from "../../service/EmployeeService";
 
 const TaskList = styled.div`
   min-height: 100px;
@@ -64,20 +57,26 @@ const columnsFromBackend = {
 };
 
 const ProjectPage = (props) => {
-  useLayoutEffect(() => {
+  const [tasks, setTasks] = useState([]);
+  const [status, setStatus] = useState();
+  const { id } = useParams();
+  const [project, setProject] = useState({});
+  const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
+  const [modalCreateTaskIsOpen, setCreateTaskModalIsOpen] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [columns, setColumns] = useState(columnsFromBackend);
+
+  useEffect(() => {
+    loadTask();
     ProjectService.getProject(id)
       .then((res) => {
         setProject(res.data);
         setStatus(res.status);
+        loadEmployees(res.data);
       })
       .catch((err) => {
-        console.error(err);
         setStatus(0);
       });
-  }, []);
-
-  useLayoutEffect(() => {
-    loadTask();
   }, []);
 
   const loadTask = () => {
@@ -93,31 +92,43 @@ const ProjectPage = (props) => {
       });
   };
 
-  const [tasks, setTasks] = useState([]);
-  const [status, setStatus] = useState();
-  const { id } = useParams();
-  const [project, setProject] = useState({});
-  const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
-  const [modalCreateTaskIsOpen, setCreateTaskModalIsOpen] = useState(false);
+  const loadEmployees = (projectData) => {
+    projectData.members.map((id) =>
+      EmployeeService.getEmployee(parseInt(id))
+        .then((res) => {
+          setEmployees((employees) => [
+            ...employees,
+            {
+              value: res.data.legajo,
+              label: res.data.Nombre,
+            },
+          ]);
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+    );
+  };
 
   const createBoard = (tasks) => {
     return {
       [uuidv4()]: {
         title: "TODO",
-        items: tasks.filter((task) => task.state.includes("TODO")),
+        items: tasks ? tasks.filter((task) => task.state.includes("TODO")) : [],
       },
       [uuidv4()]: {
         title: "IN_PROGRESS",
-        items: tasks.filter((task) => task.state.includes("IN_PROGRESS")),
+        items: tasks
+          ? tasks.filter((task) => task.state.includes("IN_PROGRESS"))
+          : [],
       },
       [uuidv4()]: {
         title: "DONE",
-        items: tasks.filter((task) => task.state.includes("DONE")),
+        items: tasks ? tasks.filter((task) => task.state.includes("DONE")) : [],
       },
     };
   };
 
-  const [columns, setColumns] = useState(columnsFromBackend);
   const onDragEnd = (result, columns, setColumns) => {
     const { source, destination, draggableId } = result;
 
@@ -191,7 +202,7 @@ const ProjectPage = (props) => {
     <Container>
       <Header {...props} />
       <Breadcrumbs {...props} />
-      {status == 200 && (
+      {project && status == 200 && (
         <>
           <Container>
             <Modal
@@ -306,18 +317,22 @@ const ProjectPage = (props) => {
                         <Card.Text>{project.description}</Card.Text>
                       </Card.Body>
                     </Card>
-                    <div>
-                      <Card>
-                        <Card.Body>
-                          <Card.Title>Integrantes</Card.Title>
-                          <Card.Text>
-                            {project?.members?.map((member, index) => (
-                              <p key={index}>{member}</p>
-                            ))}
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </div>
+                    {project.members && employees && (
+                      <div>
+                        <Card>
+                          <Card.Body>
+                            <Card.Title>Integrantes</Card.Title>
+                            <Card.Text>
+                              {employees.map((member, index) => (
+                                <p key={index}>
+                                  {member.value} {member.label}
+                                </p>
+                              ))}
+                            </Card.Text>
+                          </Card.Body>
+                        </Card>
+                      </div>
+                    )}
                   </div>
                   <Button
                     onClick={openEditProjectModalHandler}
@@ -369,7 +384,7 @@ const ProjectPage = (props) => {
           </DragDropContext>
         </>
       )}
-      {status == 0 && (
+      {project && status == 0 && (
         <div className="d-flex flex-column align-items-center justify-content-center">
           <h1>Error 404</h1>
           <h3>No se encontro el proyecto.</h3>
