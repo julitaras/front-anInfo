@@ -20,7 +20,7 @@ const initialValue = {
 };
 
 const ProjectForm = (props) => {
-  const { closeModalHandler, setProjects, type, project, projectEmployees } =
+  const { closeModalHandler, setProjects, type, project, projectEmployees, projectLeader } =
     props;
   const [employees, setEmployees] = useState([]);
   const [employeesOptions, setEmployeesOptions] = useState([]);
@@ -39,6 +39,7 @@ const ProjectForm = (props) => {
       ? initialValue
       : {
           ...project,
+          leader: projectLeader ? projectLeader : "",
           members: projectEmployees ? projectEmployees : [],
           start_date: new Date(project.start_date).toLocaleDateString("fr-CA"),
           finish_date: new Date(project.finish_date).toLocaleDateString(
@@ -53,6 +54,10 @@ const ProjectForm = (props) => {
 
   const setValuesMembersHandler = (e) => {
     setValues({ ...values, members: e });
+  };
+
+  const setValuesLeaderHandler = (e) => {
+    setValues({ ...values, leader: e });
   };
 
   const submitHandler = (e) => {
@@ -83,6 +88,10 @@ const ProjectForm = (props) => {
     );
     return options;
   };
+
+  const noLeader = (
+    { value: -1, label: "Sin Lider" }
+  );
 
   return (
     <Container>
@@ -120,13 +129,10 @@ const ProjectForm = (props) => {
 
           <FormGroup>
             <Label for="leader">Lider</Label>
-            <Input
-              type="text"
-              name="leader"
-              id="leader"
-              placeholder="Lider de ejemplo"
+            <Select
+              options={employeesOptions}
+              onChange={setValuesLeaderHandler}
               value={values.leader}
-              onChange={setValuesHandler}
             />
           </FormGroup>
 

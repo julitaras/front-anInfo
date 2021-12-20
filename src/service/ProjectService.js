@@ -24,11 +24,12 @@ class ProjectService {
   }
 
   static async createProject(values) {
+    console.log(values.leader);
     try {
       const response = await axios.post(`${PATH}/projects`, {
         name: values.name,
         description: values.description,
-        leader: values.leader,
+        leader: values.leader ? values.leader.value.toString() : "",
         state: values.state,
         members: values.members.map((member) => member.value.toString()),
         start_date: new Date(values.start_date),
@@ -57,7 +58,7 @@ class ProjectService {
         .put(`${PATH}/projects/${values.id}`, {
           name: values.name,
           description: values.description,
-          leader: values.leader,
+          leader: values.leader ? values.leader.value.toString() : "",
           members:
             values.members != []
               ? values.members.map((member) => member.value.toString())

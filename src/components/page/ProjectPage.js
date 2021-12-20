@@ -64,6 +64,7 @@ const ProjectPage = (props) => {
   const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
   const [modalCreateTaskIsOpen, setCreateTaskModalIsOpen] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const [projectLeader, setProjectLeader] = useState("");
   const [columns, setColumns] = useState(columnsFromBackend);
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const ProjectPage = (props) => {
         setProject(res.data);
         setStatus(res.status);
         loadEmployees(res.data);
+        loadLeader(res.data)
       })
       .catch((err) => {
         setStatus(0);
@@ -93,6 +95,9 @@ const ProjectPage = (props) => {
   };
 
   const loadEmployees = (projectData) => {
+    if(projectData.members[0] == ""){
+      return;
+    }
     projectData.members.map((id) =>
       EmployeeService.getEmployee(parseInt(id))
         .then((res) => {
@@ -108,6 +113,22 @@ const ProjectPage = (props) => {
           console.error(err);
         })
     );
+  };
+
+  const loadLeader = (projectData) => {
+      if(!projectData.leader){
+        return;
+      }
+      EmployeeService.getEmployee(parseInt(projectData.leader))
+        .then((res) => {
+          setProjectLeader({
+            value: res.data.legajo,
+            label: res.data.Nombre,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+        })
   };
 
   const createBoard = (tasks) => {
@@ -219,6 +240,7 @@ const ProjectPage = (props) => {
                   type="edit"
                   project={project}
                   projectEmployees={employees}
+                  projectLeader={projectLeader}
                 />
               </Modal.Body>
             </Modal>
@@ -247,8 +269,8 @@ const ProjectPage = (props) => {
                   Información sobre {project?.name}
                 </Accordion.Header>
                 <Accordion.Body>
-                  <div class="info-project">
-                    <div class="info-layer">
+                  <div className="info-project">
+                    <div className="info-layer">
                       <div>
                         <Card style={{ width: "25.5rem" }}>
                           <Card.Body>
@@ -272,13 +294,13 @@ const ProjectPage = (props) => {
                           <Card.Body>
                             <Card.Title>Lider</Card.Title>
                             <Card.Text>
-                              {project.leader ? project.leader : "Sin Lider"}
+                              {project.leader ? <div>{projectLeader.value} {projectLeader.label}</div> : "Sin Lider"}
                             </Card.Text>
                           </Card.Body>
                         </Card>
                       </div>
                     </div>
-                    <div class="info-layer">
+                    <div className="info-layer">
                       <div>
                         <Card style={{ width: "25.5rem" }}>
                           <Card.Body>
@@ -324,7 +346,7 @@ const ProjectPage = (props) => {
                         <Card.Body>
                           <Card.Title>Integrantes</Card.Title>
                           <Card.Text>
-                            {project.members != " " ? employees.map((member, index) => (
+                            {project.members != " " && project.members != "" ? employees.map((member, index) => (
                               <p key={index}>
                                 {member.value} {member.label}
                               </p>
