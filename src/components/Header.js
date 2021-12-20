@@ -19,7 +19,6 @@ class Header extends Component {
                                 <NavDropdown.Item href="/tickets">Tickets</NavDropdown.Item>
                                 <NavDropdown.Item href="/products">Productos</NavDropdown.Item>
                             </NavDropdown>
-                            <Nav.Link href="/products">Soporte</Nav.Link>
                             <Nav.Link href="/projects">Proyectos</Nav.Link>
                             <Nav.Link href="/hours">Recursos</Nav.Link>
                             
