@@ -107,7 +107,7 @@ const TaskForm = (props) => {
               value={values.assigned_to}
               onChange={setValuesHandler}
             >
-              <option value="">Ingrese un legajo</option>
+              <option value=" ">Ingrese un legajo</option>
               {employees.map((employee) => (
                 <option value={employee.legajo}>
                   {employee.legajo} - {employee.Nombre.concat(" ").concat(employee.Apellido)}
@@ -125,7 +125,7 @@ const TaskForm = (props) => {
               value={values.state}
               onChange={setValuesHandler}
             >
-              <option value="">Ingrese un valor</option>
+              <option value=" ">Ingrese un valor</option>
               <option value="TODO">TODO</option>
               <option value="IN_PROGRESS">IN_PROGRESS</option>
               <option value="DONE">DONE</option>
