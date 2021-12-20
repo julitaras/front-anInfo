@@ -21,6 +21,7 @@ import EditTicketForm from "../form/EditTicketForm";
 import ProductService from "../../service/ProductService";
 import productService from "../../service/ProductService";
 import EmployeeService from "../../service/EmployeeService";
+import withNavigate from "../../hoc/withNavigate";
 
 class TicketTable extends Component {
 
@@ -46,6 +47,7 @@ class TicketTable extends Component {
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
         this.openDeleteModal = this.openDeleteModal.bind(this);
         this.toggleShowFilters = this.toggleShowFilters.bind(this);
+        this.deleteTicket = this.deleteTicket.bind(this);
     }
 
     reloadVersions(productIDStr) {
@@ -80,7 +82,6 @@ class TicketTable extends Component {
     deleteTicket() {
         
         const ticketService = new TicketService();
-        console.log(this.state.data.ticketID);
         ticketService.deleteTicket(this.state.ticketID).then(response => {
             // Check if the response is success and redirect to home
             // if not, raise an alert
@@ -88,7 +89,8 @@ class TicketTable extends Component {
             
             if (response.status === 200) {
                 console.log(this.props);
-                this.props.history("/tickets");
+                this.loadTickets();
+                this.closeDeleteModal();
             }
         }).catch(error => {
             console.log(error);
@@ -110,7 +112,7 @@ class TicketTable extends Component {
             })});
     }
 
-    componentDidMount() {
+    loadTickets() {
         const ticketService = new TicketService();
         console.log(this.props.location.search);
         ticketService.getTickets(`/tickets${this.props.location.search}`).then(response => {
@@ -119,6 +121,10 @@ class TicketTable extends Component {
                     tickets: response.data
                 })
         });
+    }
+
+    componentDidMount() {
+        this.loadTickets();
         const productService = new ProductService();
         productService.getProducts().then(response =>
             this.setState({
@@ -353,5 +359,6 @@ class TicketTable extends Component {
 
 export default compose(
     withParams,
-    withLocation
+    withLocation,
+    withNavigate
 )(TicketTable)
