@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {Table} from "reactstrap"
-import { Button, Container, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import {Link} from "react-router-dom"
 import {faPlusSquare, faList} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -62,10 +62,18 @@ class ProductsTable extends Component {
                                                 variant="outline-success" size="sm" onClick={e => this.openModal(e.target.value)} >
                                                         <FontAwesomeIcon icon={faPlusSquare}/> Agregar ticket
                                             </Button>
-                                            <Button href={`/ticket/${product.name}/${product.versions[0]}/query`}
-                                            state={{ productID: product.id }} variant="outline-primary" size="sm" >
-                                                <FontAwesomeIcon icon={faList}/> Ver tickets
-                                            </Button>
+                                            <Link
+                                                to={
+                                                    {
+                                                        pathname: `/tickets/${product.name}/${product.versions[0]}/query`,
+                                                        search: `productID=${product.id}&productVersion=${product.versions[0]}`
+                                                    }
+                                                }
+                                                state={{ productID: product.id }}>
+                                                <Button variant="outline-primary" size="sm">
+                                                    <FontAwesomeIcon icon={faList}/> Ver tickets
+                                                </Button>
+                                            </Link>
                                         </Container>
                                     </td>
                                 </tr>
@@ -81,10 +89,18 @@ class ProductsTable extends Component {
                                                     variant="outline-success" size="sm" onClick={e => this.openModal(e.target.value)} >
                                                             <FontAwesomeIcon icon={faPlusSquare}/> Agregar ticket
                                                 </Button>
-                                                <Button href={`/ticket/${product.name}/${version}/query`}
-                                                state={{ productID: product.id }} variant="outline-primary" size="sm" >
-                                                    <FontAwesomeIcon icon={faList}/> Ver tickets
-                                                </Button>
+                                                <Link
+                                                    to={
+                                                        {
+                                                            pathname: `/tickets/${product.name}/${version}/query`,
+                                                            search: `productID=${product.id}&productVersion=${version}`
+                                                        }
+                                                    }
+                                                >
+                                                    <Button variant="outline-primary" size="sm">
+                                                        <FontAwesomeIcon icon={faList}/> Ver tickets
+                                                    </Button>
+                                                </Link>
                                                 </Container>
                                                 </td> 
                                             </tr>);
@@ -108,7 +124,7 @@ class ProductsTable extends Component {
                     </small></small></small></Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <TicketForm params={{name: this.state.productName, version: this.state.productVersion, productID: this.state.productID}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID }}/>
+                <TicketForm params={{name: this.state.productName, version: this.state.productVersion, productID: this.state.productID, editionMode: false}} name={this.state.productName} version={this.state.productVersion} state={{ productID: this.state.productID }}/>
             </Modal.Body>
         </Modal>
             <div className="ProductList">

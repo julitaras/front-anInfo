@@ -12,9 +12,8 @@ import {
     Input,
     Label
   } from 'reactstrap';
-import Header from "../Header";
 import withNavigate from "../../hoc/withNavigate";
-import { Breadcrumb, Container } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 class TicketForm extends Component {
 
@@ -84,7 +83,7 @@ class TicketForm extends Component {
     render() {
         return (
             <Container>
-            <div>
+            <div className={TicketForm}>
                 <Form onSubmit={(e) => this.postTicket(e)}>
                     <FormGroup>
                         <Label for="subject">Asunto</Label>
