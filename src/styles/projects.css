@@ -1,0 +1,68 @@
+.form-required {
+  color: red;
+}
+
+.project-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-searchbar {
+  display: flex;
+  width: 80%;
+}
+
+.search-icon {
+  font-size: 1.3rem;
+  margin-right: 0.5rem;
+}
+
+.project-card {
+  margin: 1.5rem 0rem;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.project-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding-top: 3%;
+}
+
+.project-card-dates {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-card-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-layer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.info-project {
+  padding-bottom: 1ch;
+}
+
+.createButton{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.task-buttons{
+  display: flex;
+  justify-content: space-between;
+}
+
+.task-information {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
