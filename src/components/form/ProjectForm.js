@@ -84,7 +84,7 @@ const ProjectForm = (props) => {
   const getEmployeesOptions = (employees) => {
     var options = [];
     employees.map((employee) =>
-      options.push({ value: employee.legajo, label: employee.Nombre })
+      options.push({ value: employee.legajo, label: employee.Nombre.concat(" ").concat(employee.Apellido) })
     );
     return options;
   };

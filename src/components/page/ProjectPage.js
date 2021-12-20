@@ -105,7 +105,7 @@ const ProjectPage = (props) => {
             ...employees,
             {
               value: res.data.legajo,
-              label: res.data.Nombre,
+              label: res.data.Nombre.concat(" ").concat(res.data.Apellido),
             },
           ]);
         })
@@ -123,7 +123,7 @@ const ProjectPage = (props) => {
         .then((res) => {
           setProjectLeader({
             value: res.data.legajo,
-            label: res.data.Nombre,
+            label: res.data.Nombre.concat(" ").concat(res.data.Apellido),
           });
         })
         .catch((err) => {
@@ -294,7 +294,7 @@ const ProjectPage = (props) => {
                           <Card.Body>
                             <Card.Title>Lider</Card.Title>
                             <Card.Text>
-                              {project.leader ? <div>{projectLeader.value} {projectLeader.label}</div> : "Sin Lider"}
+                              {project.leader ? <div>{projectLeader.label} ({projectLeader.value})</div> : "Sin Lider"}
                             </Card.Text>
                           </Card.Body>
                         </Card>
@@ -348,7 +348,7 @@ const ProjectPage = (props) => {
                           <Card.Text>
                             {project.members != " " && project.members != "" ? employees.map((member, index) => (
                               <p key={index}>
-                                {member.value} {member.label}
+                                {member.label} ({member.value})
                               </p>
                             )) : "Sin integrantes en el proyecto"}
                           </Card.Text>
