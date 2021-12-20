@@ -9,6 +9,8 @@ import {Container, Breadcrumb, Badge, Row, Col, ListGroup, Modal, Button} from "
 import moment from "moment";
 import ClientService from "../../service/ClientService";
 import EditTicketForm from "../form/EditTicketForm";
+import {Form, FormGroup, Input, Label} from "reactstrap";
+import ProjectService from "../../service/ProjectService";
 
 class TicketPage extends Component {
 
@@ -18,25 +20,53 @@ class TicketPage extends Component {
             data: {},
             clientName: "",
             editModalIsOpen: false,
-            deleteModalIsOpen: false
+            deleteModalIsOpen: false,
+            taskModalIsOpen: false,
+            projects: [],
+            taskID: undefined,
+            tasks: []
         };
-        console.log(this.props);
         this.closeEditModal = this.closeEditModal.bind(this);
         this.openEditModal = this.openEditModal.bind(this);
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
         this.openDeleteModal = this.openDeleteModal.bind(this);
+        this.closeTaskModal = this.closeTaskModal.bind(this);
+        this.openTaskModal = this.openTaskModal.bind(this);
         this.deleteTicket = this.deleteTicket.bind(this);
     }
 
-    componentDidMount() {
+    loadTicketsAndTasks() {
         const ticketService = new TicketService();
+        const projectService = new ProjectService();
         ticketService.getTickets(`/tickets/${this.props.params.ticketID}`).then(response => {
             this.setState(
                 {
                     data: response.data
                 })
             this.getClientName(this.state.data.clientID);
+            projectService.getTasks().then(responseTasks => {
+                this.setState(
+                    {
+                        tasks: responseTasks.data.filter((task) =>{
+                            return response.data.taskIDs.includes(task.id);
+                        })
+                    })
+                console.log(this.state.tasks);
+            });
         });
+        
+        
+    }
+
+    componentDidMount() {
+        this.loadTicketsAndTasks();
+        const projectService = new ProjectService();
+        projectService.getProjects().then(response => {
+            this.setState(
+                {
+                    projects: response.data
+                })
+        })
         
     }
 
@@ -64,6 +94,50 @@ class TicketPage extends Component {
 
     closeDeleteModal = () => {
         this.setState({deleteModalIsOpen: false});
+    }
+
+    openTaskModal = (value) => {
+        this.setState({taskModalIsOpen: true});
+    }
+
+    closeTaskModal = () => {
+        this.setState({taskModalIsOpen: false});
+    }
+
+    createTask(e) {
+        const formData = new FormData(e.target);
+        e.preventDefault();
+        var task = {};
+        for (let [key, value] of formData.entries()) {
+            task[key] = value;
+        }
+        task.project_id = parseInt(task.project_id);
+        task['state'] = "TODO";
+        task['worked_hours'] = '0';
+        task['asigned_to'] = this.state.data.employeeID;
+        task['start_date'] = moment();
+        var ticket = JSON.parse(JSON.stringify(this.state.data));
+        delete ticket.ticketID;
+        delete ticket.expectedDate;
+        delete ticket.createdDate;
+        const projectService = new ProjectService();
+        const ticketService = new TicketService();
+        projectService.createTask(task).then(response => {
+            console.log(response);
+            this.setState({taskID: response.data.id});
+            ticket.taskIDs.push(this.state.taskID);
+            ticketService.updateTicket(this.state.data.ticketID, ticket).then(response => {
+                // Check if the response is success and redirect to home
+                // if not, raise an alert
+                console.log(response);
+                this.loadTicketsAndTasks();
+                this.closeTaskModal();
+                
+            }).catch(error => {
+                console.log(error);
+                alert("Error al crear ticket")
+            });
+        });
     }
 
     deleteTicket() {
@@ -102,6 +176,63 @@ class TicketPage extends Component {
                         <Button onClick={this.deleteTicket} variant="danger">Eliminar</Button>
                     </Modal.Footer>
                 </Modal>
+                <Modal size="lg" show={this.state.taskModalIsOpen} onHide={this.closeTaskModal}>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Crear tarea <small><small><small>
+                                    {`(Ticket #${this.state.data.ticketID})`}
+                                </small></small></small></Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form onSubmit={(e) => this.createTask(e)}>
+                                <FormGroup>
+                                    <Label for="proyect">Proyecto</Label>
+                                    <Input type="select" name="project_id" id="proyect">
+                                        {
+                                            this.state.projects.map((project, index) => {
+                                                return (
+                                                    <option key={index} value={project['id']}>
+                                                        {project["name"]}
+                                                    </option>);
+                                            })
+                                        }
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="name">Nombre</Label>
+                                    <Input
+                                        type="text"
+                                        name="name"
+                                        id="name"
+                                        placeholder="Nombre de la tarea"
+                                    />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Label for="description">Descripcion</Label>
+                                    <Input
+                                        type="textarea"
+                                        name="description"
+                                        id="description"
+                                        placeholder="Descripcion de ejemplo"
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="estimated_hours">Cantidad estimada de horas</Label>
+                                    <Input
+                                        type="number"
+                                        name="estimated_hours"
+                                        id="estimated_hours"
+                                        placeholder="10"
+                                    />
+                                </FormGroup>
+                                <Button onClick={this.closeTaskModal} variant="secondary">Cancelar</Button>{'  '}
+                                <Button variant="success" type="submit">Crear tarea</Button>    
+                            </Form>
+                        </Modal.Body>
+                        <Modal.Footer>
+                        
+                    </Modal.Footer>
+                </Modal>
                 <Modal size="lg" show={this.state.editModalIsOpen} onHide={this.closeEditModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Editar ticket <small><small><small>
@@ -130,7 +261,7 @@ class TicketPage extends Component {
                             </h2>
                         </Col>
                         <Col xs={4} sm={4} md={4} lg={4} xl={4} xxl={4}>
-                            <Button variant="success">Crear tarea</Button> {'   '}
+                            <Button onClick={this.openTaskModal} variant="success">Crear tarea</Button> {'   '}
                             <Button onClick={this.openEditModal} variant="primary">Editar Ticket</Button> {'   '}
                             <Button onClick={this.openDeleteModal} variant="danger">Eliminar Ticket</Button>
                         </Col>
@@ -157,10 +288,11 @@ class TicketPage extends Component {
                         <Col>
                         <strong>Tareas:  </strong>
                         <ListGroup variant="flush">
-                            <ListGroup.Item>Tarea 1</ListGroup.Item>
-                            <ListGroup.Item>Tarea 2</ListGroup.Item>
-                            <ListGroup.Item>Tarea 3</ListGroup.Item>
-                            <ListGroup.Item>Tarea 4</ListGroup.Item>
+                            {this.state.tasks?.map((task) => {
+                                return (
+                                    <ListGroup.Item action key={task.id} href={`/projects/${task.project_id}`}>{task.name}</ListGroup.Item>
+                                )
+                            })}
                         </ListGroup>
                         </Col>
                     </Row>
