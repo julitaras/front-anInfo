@@ -318,22 +318,21 @@ const ProjectPage = (props) => {
                         <Card.Text>{project.description}</Card.Text>
                       </Card.Body>
                     </Card>
-                    {project.members && employees && (
-                      <div>
-                        <Card>
-                          <Card.Body>
-                            <Card.Title>Integrantes</Card.Title>
-                            <Card.Text>
-                              {employees.map((member, index) => (
-                                <p key={index}>
-                                  {member.value} {member.label}
-                                </p>
-                              ))}
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </div>
-                    )}
+
+                    <div>
+                      <Card>
+                        <Card.Body>
+                          <Card.Title>Integrantes</Card.Title>
+                          <Card.Text>
+                            {project.members != " " ? employees.map((member, index) => (
+                              <p key={index}>
+                                {member.value} {member.label}
+                              </p>
+                            )) : "Sin integrantes en el proyecto"}
+                          </Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </div>
                   </div>
                   <Button
                     onClick={openEditProjectModalHandler}
