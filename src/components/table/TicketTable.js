@@ -7,7 +7,7 @@ import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import {Button, Container, Modal, Overlay, Popover, Row, Col} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faList, faPlusSquare, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faPlusSquare, faTrash, faEdit} from "@fortawesome/free-solid-svg-icons";
 import {
     Form,
     FormGroup,
@@ -289,7 +289,7 @@ class TicketTable extends Component {
                                         <Button variant="outline-primary" size="sm"
                                             onClick={e => this.openEditModal(e.target.value)}
                                             value={ ticket.ticketID } >
-                                            <FontAwesomeIcon icon={faList}/> Editar
+                                            <FontAwesomeIcon icon={faEdit}/> Editar
                                         </Button>{'   '}
                                         <Button variant="outline-danger" size="sm"
                                             onClick={e => this.openDeleteModal(e.target.value)}

@@ -13,6 +13,16 @@ class ProjectService {
     }
   }
 
+  async getProjects() {
+    try {
+      const response = await axios.get(`${PATH}/projects`);
+      return response;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+  }
+
   static async createProject(values) {
     try {
       const response = await axios.post(`${PATH}/projects`, {
@@ -106,7 +116,35 @@ class ProjectService {
     }
   }
 
+  async createTask(values) {
+    try {
+      const response = await axios.post(`${PATH}/tasks`, {
+        name: values.name,
+        description: values.description,
+        project_id: values.project_id,
+        state: values.state,
+        start_date: new Date(values.start_date),
+        worked_hours: parseInt(values.worked_hours),
+        estimated_hours: parseInt(values.estimated_hours),
+        assigned_to: values.assigned_to,
+      });
+      return response;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+  }
+
   static async getTasks() {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`${PATH}/tasks`)
+        .then((res) => resolve(res))
+        .catch((err) => reject(err))
+    );
+  }
+
+  async getTasks() {
     return new Promise((resolve, reject) =>
       axios
         .get(`${PATH}/tasks`)
