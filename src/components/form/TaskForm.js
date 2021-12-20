@@ -5,81 +5,62 @@ import withLocation from "../../hoc/withLocation";
 import { Form, FormGroup, Input, Label } from "reactstrap";
 import { Breadcrumb, Container, Modal, Button } from "react-bootstrap";
 import ProjectService from "../../service/ProjectService";
-import Select from "react-select";
 import EmployeeService from "../../service/EmployeeService";
 
-const initialValue = {
-  name: "",
-  description: "",
-  leader: "",
-  members: [],
-  state: "",
-  start_date: "",
-  finish_date: "",
-  worked_hours: 0,
-};
+const TaskForm = (props) => {
+  const { closeModalHandler, type, task, projectId, taskReload } = props;
 
-const ProjectForm = (props) => {
-  const { closeModalHandler, setProjects, type, project } = props;
-  const [employees, setEmployees] = useState([]);
-  const [employeesOptions, setEmployeesOptions] = useState([]);
-
-  useLayoutEffect(() => {
-    EmployeeService.getEmployees()
-      .then((res) => {
-        setEmployees(res.data);
-        setEmployeesOptions(getEmployeesOptions(res.data));
-      })
-      .catch((err) => console.error(err));
-  }, []);
+  const initialValue = {
+    name: "",
+    description: "",
+    assigned_to: "",
+    state: "",
+    start_date: "",
+    creation_date: "",
+    worked_hours: 0,
+    project_id: projectId,
+    estimated_hours: 0,
+  };
 
   const [values, setValues] = useState(
-    !project
+    !task
       ? initialValue
       : {
-          ...project,
-          start_date: new Date(project.start_date).toLocaleDateString("fr-CA"),
-          finish_date: new Date(project.finish_date).toLocaleDateString(
-            "fr-CA"
-          ),
+          ...task,
+          start_date: new Date(task.start_date).toLocaleDateString("fr-CA", {
+            timeZone: "UTC",
+          }),
         }
   );
-
   const setValuesHandler = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const setValuesMembersHandler = (e) => {
-    setValues({ ...values, members: e });
-  };
+  const [employees, setEmployees] = useState([]);
+
+  useLayoutEffect(() => {
+    EmployeeService.getEmployees()
+      .then((res) => {
+        console.log(res);
+        setEmployees(res.data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const submitHandler = (e) => {
-    console.log(values.members);
     e.preventDefault();
     if (type === "create") {
-      ProjectService.createProject(values)
-        .then((res) =>
-          ProjectService.getProjects()
-            .then((res) => setProjects({ active: res.data, all: res.data }))
-            .catch((err) => console.error(err))
-        )
+      ProjectService.createTask(values)
+        .then((res) => taskReload())
         .catch((err) => console.error(err));
     } else {
-      ProjectService.editProject(values)
-        .then((res) => window.location.reload())
+      ProjectService.editTask(values)
+        .then((res) => taskReload())
         .catch((err) => console.error(err));
       console.log(values);
     }
 
     closeModalHandler();
-  };
-
-  const getEmployeesOptions = (employees) => {
-    var options = [];
-    employees.map((employee) =>
-      options.push({ value: employee.legajo, label: employee.Nombre })
-    );
-    return options;
   };
 
   return (
@@ -117,34 +98,22 @@ const ProjectForm = (props) => {
           </FormGroup>
 
           <FormGroup>
-            <Label for="leader">Lider</Label>
+            <Label for="assigned_to">Asignada a:</Label>
             <Input
-              type="text"
-              name="leader"
-              id="leader"
-              placeholder="Lider de ejemplo"
-              value={values.leader}
-              onChange={setValuesHandler}
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label for="members">Miembros</Label>
-            {/* <Input
               type="select"
-              name="members"
-              id="members"
-              placeholder="Miembro de ejemplo"
-              value={values.members}
+              name="assigned_to"
+              id="assignedTo"
+              placeholder="Número de legajo de empleado a asignar tarea"
+              value={values.assigned_to}
               onChange={setValuesHandler}
-            > */}
-            <Select
-              options={employeesOptions}
-              isMulti
-              onChange={setValuesMembersHandler}
-              value={values.members}
-            />
-            {/* </Input> */}
+            >
+              <option value="">Ingrese un legajo</option>
+              {employees.map((employee) => (
+                <option value={employee.legajo}>
+                  {employee.legajo} {employee.Nombre}
+                </option>
+              ))}
+            </Input>
           </FormGroup>
 
           <FormGroup>
@@ -177,30 +146,24 @@ const ProjectForm = (props) => {
           )}
 
           <FormGroup>
-            <Label for="startDate">
-              Fecha de inicio<span className="form-required">*</span>
-            </Label>
+            <Label for="workedHours">Horas estimadas</Label>
+            <Input
+              type="number"
+              name="estimated_hours"
+              id="estimatedHours"
+              value={values.estimated_hours}
+              onChange={setValuesHandler}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label for="startDate">Fecha de inicio</Label>
             <Input
               type="date"
               name="start_date"
               id="startDate"
               value={values.start_date}
               onChange={setValuesHandler}
-              required
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label for="finishDate">
-              Fecha de finalización<span className="form-required">*</span>
-            </Label>
-            <Input
-              type="date"
-              name="finish_date"
-              id="finishDate"
-              value={values.finish_date}
-              onChange={setValuesHandler}
-              required
             />
           </FormGroup>
           <p>
@@ -208,7 +171,7 @@ const ProjectForm = (props) => {
           </p>
           <Modal.Footer>
             <Button type="submit" variant="primary">
-              {type == "crear" ? "Crear Proyecto" : "Guardar Proyecto"}
+              {type == "crear" ? "Crear Tarea" : "Guardar Tarea"}
             </Button>
           </Modal.Footer>
         </Form>
@@ -217,4 +180,4 @@ const ProjectForm = (props) => {
   );
 };
 
-export default compose(withParams, withLocation)(ProjectForm);
+export default compose(withParams, withLocation)(TaskForm);

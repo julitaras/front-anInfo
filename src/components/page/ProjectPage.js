@@ -1,24 +1,67 @@
 import React, { useState, useLayoutEffect } from "react";
 import styled from "styled-components";
-import dataset from "../../dataset/dataset.js";
-import Column from "../column/Column";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { compose } from "redux";
-import { Container, Accordion, Card, Button, Modal } from "react-bootstrap";
+import {
+  Container,
+  Accordion,
+  Card,
+  Button,
+  Modal,
+  ListGroup,
+  Text,
+} from "react-bootstrap";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 import ProjectForm from "../form/ProjectForm";
-
+import { v4 as uuidv4 } from "uuid";
+import TaskCard from "../task/TaskCard.js";
 import { useParams } from "react-router-dom";
+import TaskForm from "../form/TaskForm";
 
-const TaskContainer = styled.div`
+const TaskList = styled.div`
+  min-height: 100px;
   display: flex;
+  flex-direction: column;
+  background: #f3f3f3;
+  min-width: 341px;
+  border-radius: 5px;
+  padding: 15px 15px;
+  margin-right: 45px;
 `;
+
+const TaskColumnStyles = styled.div`
+  margin: 8px;
+  display: flex;
+  width: 100%;
+  min-height: 80vh;
+`;
+
+const Title = styled.h3`
+  padding: 0 1rem;
+  margin: 1rem 0;
+  align-self: flex-start;
+`;
+
+const columnsFromBackend = {
+  [uuidv4()]: {
+    title: "TODO",
+    items: [],
+  },
+  [uuidv4()]: {
+    title: "IN_PROGRESS",
+    items: [],
+  },
+  [uuidv4()]: {
+    title: "DONE",
+    items: [],
+  },
+};
 
 const ProjectPage = (props) => {
   useLayoutEffect(() => {
@@ -32,92 +75,101 @@ const ProjectPage = (props) => {
         setStatus(0);
       });
   }, []);
+
+  useLayoutEffect(() => {
+    loadTask();
+  }, []);
+
+  const loadTask = () => {
+    ProjectService.getTasksByProjectId(id)
+      .then((res) => {
+        setTasks(res.data);
+        setStatus(res.status);
+        setColumns(createBoard(res.data));
+      })
+      .catch((err) => {
+        console.error(err);
+        setStatus(0);
+      });
+  };
+
+  const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState();
   const { id } = useParams();
   const [project, setProject] = useState({});
+  const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
+  const [modalCreateTaskIsOpen, setCreateTaskModalIsOpen] = useState(false);
 
-  const [data, setData] = useState(dataset);
+  const createBoard = (tasks) => {
+    return {
+      [uuidv4()]: {
+        title: "TODO",
+        items: tasks.filter((task) => task.state.includes("TODO")),
+      },
+      [uuidv4()]: {
+        title: "IN_PROGRESS",
+        items: tasks.filter((task) => task.state.includes("IN_PROGRESS")),
+      },
+      [uuidv4()]: {
+        title: "DONE",
+        items: tasks.filter((task) => task.state.includes("DONE")),
+      },
+    };
+  };
 
-  const onDragEnd = (result) => {
-    const { destination, source, draggableId, type } = result;
-    //If there is no destination
-    if (!destination) {
-      return;
-    }
+  const [columns, setColumns] = useState(columnsFromBackend);
+  const onDragEnd = (result, columns, setColumns) => {
+    const { source, destination, draggableId } = result;
 
-    //If source and destination is the same
+    if (!destination) return;
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
-    ) {
+    )
       return;
-    }
 
-    //If you're dragging columns
-    if (type === "column") {
-      const newColumnOrder = Array.from(data.columnOrder);
-      newColumnOrder.splice(source.index, 1);
-      newColumnOrder.splice(destination.index, 0, draggableId);
-      const newState = {
-        ...data,
-        columnOrder: newColumnOrder,
-      };
-      setData(newState);
-      return;
-    }
-
-    //Anything below this happens if you're dragging tasks
-    const start = data.columns[source.droppableId];
-    const finish = data.columns[destination.droppableId];
-
-    //If dropped inside the same column
-    if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
-      const newColumn = {
-        ...start,
-        taskIds: newTaskIds,
-      };
-      const newState = {
-        ...data,
-        columns: {
-          ...data.columns,
-          [newColumn.id]: newColumn,
+    if (source.droppableId !== destination.droppableId) {
+      const sourceColumn = columns[source.droppableId];
+      const destColumn = columns[destination.droppableId];
+      const sourceItems = [...sourceColumn.items];
+      const destItems = [...destColumn.items];
+      const [removed] = sourceItems.splice(source.index, 1);
+      destItems.splice(destination.index, 0, removed);
+      setColumns({
+        ...columns,
+        [source.droppableId]: {
+          ...sourceColumn,
+          items: sourceItems,
         },
-      };
-      setData(newState);
-      return;
+        [destination.droppableId]: {
+          ...destColumn,
+          items: destItems,
+        },
+      });
+      ProjectService.updateTaskStatus({
+        id: draggableId,
+        state: columns[destination.droppableId].title,
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      const column = columns[source.droppableId];
+      const copiedItems = [...column.items];
+      const [removed] = copiedItems.splice(source.index, 1);
+      copiedItems.splice(destination.index, 0, removed);
+      setColumns({
+        ...columns,
+        [source.droppableId]: {
+          ...column,
+          items: copiedItems,
+        },
+      });
     }
-
-    //If dropped in a different column
-    const startTaskIds = Array.from(start.taskIds);
-    startTaskIds.splice(source.index, 1);
-    const newStart = {
-      ...start,
-      taskIds: startTaskIds,
-    };
-
-    const finishTaskIds = Array.from(finish.taskIds);
-    finishTaskIds.splice(destination.index, 0, draggableId);
-    const newFinish = {
-      ...finish,
-      taskIds: finishTaskIds,
-    };
-
-    const newState = {
-      ...data,
-      columns: {
-        ...data.columns,
-        [newStart.id]: newStart,
-        [newFinish.id]: newFinish,
-      },
-    };
-
-    setData(newState);
   };
-
-  const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
 
   const openEditProjectModalHandler = () => {
     setEditProjectModalIsOpen(true);
@@ -125,6 +177,14 @@ const ProjectPage = (props) => {
 
   const closeEditProjectModalHandler = () => {
     setEditProjectModalIsOpen(false);
+  };
+
+  const openCreateTaskModalHandler = () => {
+    setCreateTaskModalIsOpen(true);
+  };
+
+  const closeCreateTaskModalHandler = () => {
+    setCreateTaskModalIsOpen(false);
   };
 
   return (
@@ -147,6 +207,24 @@ const ProjectPage = (props) => {
                   closeModalHandler={closeEditProjectModalHandler}
                   type="edit"
                   project={project}
+                />
+              </Modal.Body>
+            </Modal>
+
+            <Modal
+              size="lg"
+              show={modalCreateTaskIsOpen}
+              onHide={closeCreateTaskModalHandler}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Crear Tarea</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <TaskForm
+                  closeModalHandler={closeCreateTaskModalHandler}
+                  type="create"
+                  projectId={project.id}
+                  taskReload={loadTask}
                 />
               </Modal.Body>
             </Modal>
@@ -233,8 +311,9 @@ const ProjectPage = (props) => {
                         <Card.Body>
                           <Card.Title>Integrantes</Card.Title>
                           <Card.Text>
-                            Aca irian los integrantes *si tan solo los tuviera
-                            :( *
+                            {project?.members?.map((member, index) => (
+                              <p key={index}>{member}</p>
+                            ))}
                           </Card.Text>
                         </Card.Body>
                       </Card>
@@ -249,38 +328,44 @@ const ProjectPage = (props) => {
                 </Accordion.Body>
               </Accordion.Item>
             </Accordion>
-            <h1>Tareas</h1>
+            <br />
           </Container>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable
-              droppableId="all-columns"
-              direction="horizontal"
-              type="column"
-            >
-              {(provided) => (
-                <TaskContainer
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {data.columnOrder.map((id, index) => {
-                    const column = data.columns[id];
-                    const tasks = column.taskIds.map(
-                      (taskId) => data.tasks[taskId]
-                    );
-
-                    return (
-                      <Column
-                        key={column.id}
-                        column={column}
-                        tasks={tasks}
-                        index={index}
-                      />
-                    );
-                  })}
-                  {provided.placeholder}
-                </TaskContainer>
-              )}
-            </Droppable>
+          <DragDropContext
+            onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
+          >
+            <Container>
+              <h1>Tareas</h1>
+              <div className="createButton">
+                <Button onClick={openCreateTaskModalHandler} variant="primary">
+                  <FontAwesomeIcon icon={faPlusSquare} /> Crear Tarea
+                </Button>
+              </div>
+              <TaskColumnStyles>
+                {Object.entries(columns).map(([columnId, column], index) => {
+                  return (
+                    <Droppable key={columnId} droppableId={columnId}>
+                      {(provided, snapshot) => (
+                        <TaskList
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                        >
+                          <Title>{column.title}</Title>
+                          {column.items.map((item, index) => (
+                            <TaskCard
+                              key={item}
+                              item={item}
+                              index={index}
+                              taskReload={() => loadTask()}
+                            />
+                          ))}
+                          {provided.placeholder}
+                        </TaskList>
+                      )}
+                    </Droppable>
+                  );
+                })}
+              </TaskColumnStyles>
+            </Container>
           </DragDropContext>
         </>
       )}
