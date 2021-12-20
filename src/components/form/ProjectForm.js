@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { Form, FormGroup, Input, Label } from "reactstrap";
 import { Breadcrumb, Container, Modal, Button } from "react-bootstrap";
-
 import ProjectService from "../../service/ProjectService";
+import Select from "react-select";
+import EmployeeService from "../../service/EmployeeService";
 
 const initialValue = {
   name: "",
   description: "",
   leader: "",
+  members: [],
   state: "",
   start_date: "",
   finish_date: "",
@@ -19,6 +21,18 @@ const initialValue = {
 
 const ProjectForm = (props) => {
   const { closeModalHandler, setProjects, type, project } = props;
+  const [employees, setEmployees] = useState([]);
+  const [employeesOptions, setEmployeesOptions] = useState([]);
+
+  useLayoutEffect(() => {
+    EmployeeService.getEmployees()
+      .then((res) => {
+        setEmployees(res.data);
+        setEmployeesOptions(getEmployeesOptions(res.data));
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   const [values, setValues] = useState(
     !project
       ? initialValue
@@ -30,11 +44,17 @@ const ProjectForm = (props) => {
           ),
         }
   );
+
   const setValuesHandler = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
+  const setValuesMembersHandler = (e) => {
+    setValues({ ...values, members: e });
+  };
+
   const submitHandler = (e) => {
+    console.log(values.members);
     e.preventDefault();
     if (type === "create") {
       ProjectService.createProject(values)
@@ -52,6 +72,14 @@ const ProjectForm = (props) => {
     }
 
     closeModalHandler();
+  };
+
+  const getEmployeesOptions = (employees) => {
+    var options = [];
+    employees.map((employee) =>
+      options.push({ value: employee.legajo, label: employee.Nombre })
+    );
+    return options;
   };
 
   return (
@@ -101,6 +129,25 @@ const ProjectForm = (props) => {
           </FormGroup>
 
           <FormGroup>
+            <Label for="members">Miembros</Label>
+            {/* <Input
+              type="select"
+              name="members"
+              id="members"
+              placeholder="Miembro de ejemplo"
+              value={values.members}
+              onChange={setValuesHandler}
+            > */}
+            <Select
+              options={employeesOptions}
+              isMulti
+              onChange={setValuesMembersHandler}
+              value={values.members}
+            />
+            {/* </Input> */}
+          </FormGroup>
+
+          <FormGroup>
             <Label for="Estado">Estado</Label>
             <Input
               type="select"
@@ -118,7 +165,7 @@ const ProjectForm = (props) => {
 
           {type == "edit" && (
             <FormGroup show={type == "edit"}>
-              <Label for="workedHours">Horas Trabajadas</Label>
+              <Label for="workedHours">Horas trabajadas</Label>
               <Input
                 type="number"
                 name="worked_hours"
@@ -131,7 +178,7 @@ const ProjectForm = (props) => {
 
           <FormGroup>
             <Label for="startDate">
-              Fecha de Inicio<span className="form-required">*</span>
+              Fecha de inicio<span className="form-required">*</span>
             </Label>
             <Input
               type="date"
@@ -145,7 +192,7 @@ const ProjectForm = (props) => {
 
           <FormGroup>
             <Label for="finishDate">
-              Fecha de Finalización<span className="form-required">*</span>
+              Fecha de finalización<span className="form-required">*</span>
             </Label>
             <Input
               type="date"

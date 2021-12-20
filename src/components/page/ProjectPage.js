@@ -4,7 +4,15 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import withParams from "../../hoc/withParams";
 import withLocation from "../../hoc/withLocation";
 import { compose } from "redux";
-import { Container, Accordion, Card, Button, Modal } from "react-bootstrap";
+import {
+  Container,
+  Accordion,
+  Card,
+  Button,
+  Modal,
+  ListGroup,
+  Text,
+} from "react-bootstrap";
 import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
@@ -179,6 +187,8 @@ const ProjectPage = (props) => {
     setCreateTaskModalIsOpen(false);
   };
 
+  const getEmployeeInformation = () => {};
+
   return (
     <Container>
       <Header {...props} />
@@ -303,8 +313,9 @@ const ProjectPage = (props) => {
                         <Card.Body>
                           <Card.Title>Integrantes</Card.Title>
                           <Card.Text>
-                            Aca irian los integrantes *si tan solo los tuviera
-                            :( *
+                            {project?.members?.map((member, index) => (
+                              <p key={index}>{member}</p>
+                            ))}
                           </Card.Text>
                         </Card.Body>
                       </Card>
