@@ -9,15 +9,12 @@ import Header from "../Header";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectService from "../../service/ProjectService.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 import ProjectForm from "../form/ProjectForm";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import TaskCard from "../task/TaskCard.js";
 import { useParams } from "react-router-dom";
-
-// const TaskContainer = styled.div`
-//   display: flex;
-// `;
+import TaskForm from "../form/TaskForm";
 
 const TaskList = styled.div`
   min-height: 100px;
@@ -38,25 +35,25 @@ const TaskColumnStyles = styled.div`
 `;
 
 const Title = styled.h3`
-    padding: 0 1rem;
-    margin: 1rem 0;
-    align-self: flex-start;
+  padding: 0 1rem;
+  margin: 1rem 0;
+  align-self: flex-start;
 `;
 
 const columnsFromBackend = {
-    [uuidv4()]: {
-      title: 'To-do',
-      items: [],
-    },
-    [uuidv4()]: {
-      title: 'In Progress',
-      items: [],
-    },
-    [uuidv4()]: {
-      title: 'Done',
-      items: [],
-    },
-  };
+  [uuidv4()]: {
+    title: "TODO",
+    items: [],
+  },
+  [uuidv4()]: {
+    title: "IN_PROGRESS",
+    items: [],
+  },
+  [uuidv4()]: {
+    title: "DONE",
+    items: [],
+  },
+};
 
 const ProjectPage = (props) => {
   useLayoutEffect(() => {
@@ -72,6 +69,10 @@ const ProjectPage = (props) => {
   }, []);
 
   useLayoutEffect(() => {
+    loadTask();
+  }, []);
+
+  const loadTask = () => {
     ProjectService.getTasksByProjectId(id)
       .then((res) => {
         setTasks(res.data);
@@ -82,38 +83,43 @@ const ProjectPage = (props) => {
         console.error(err);
         setStatus(0);
       });
-  }, []);
+  };
 
   const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState();
   const { id } = useParams();
   const [project, setProject] = useState({});
   const [modalEditProjectIsOpen, setEditProjectModalIsOpen] = useState(false);
+  const [modalCreateTaskIsOpen, setCreateTaskModalIsOpen] = useState(false);
 
   const createBoard = (tasks) => {
     return {
-        [uuidv4()]: {
-          title: 'To-do',
-          items: tasks.filter((task) => task.state.includes("TODO")),
-        },
-        [uuidv4()]: {
-          title: 'In Progress',
-          items: tasks.filter((task) => task.state.includes("IN_PROGRESS")),
-        },
-        [uuidv4()]: {
-          title: 'Done',
-          items: tasks.filter((task) => task.state.includes("DONE")),
-        },
-      }
-  }
+      [uuidv4()]: {
+        title: "TODO",
+        items: tasks.filter((task) => task.state.includes("TODO")),
+      },
+      [uuidv4()]: {
+        title: "IN_PROGRESS",
+        items: tasks.filter((task) => task.state.includes("IN_PROGRESS")),
+      },
+      [uuidv4()]: {
+        title: "DONE",
+        items: tasks.filter((task) => task.state.includes("DONE")),
+      },
+    };
+  };
 
   const [columns, setColumns] = useState(columnsFromBackend);
-const onDragEnd = (result, columns, setColumns) => {
-    const { source, destination } = result;
+  const onDragEnd = (result, columns, setColumns) => {
+    const { source, destination, draggableId } = result;
 
     if (!destination) return;
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-   
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
+
     if (source.droppableId !== destination.droppableId) {
       const sourceColumn = columns[source.droppableId];
       const destColumn = columns[destination.droppableId];
@@ -132,6 +138,16 @@ const onDragEnd = (result, columns, setColumns) => {
           items: destItems,
         },
       });
+      ProjectService.updateTaskStatus({
+        id: draggableId,
+        state: columns[destination.droppableId].title,
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     } else {
       const column = columns[source.droppableId];
       const copiedItems = [...column.items];
@@ -155,6 +171,14 @@ const onDragEnd = (result, columns, setColumns) => {
     setEditProjectModalIsOpen(false);
   };
 
+  const openCreateTaskModalHandler = () => {
+    setCreateTaskModalIsOpen(true);
+  };
+
+  const closeCreateTaskModalHandler = () => {
+    setCreateTaskModalIsOpen(false);
+  };
+
   return (
     <Container>
       <Header {...props} />
@@ -175,6 +199,24 @@ const onDragEnd = (result, columns, setColumns) => {
                   closeModalHandler={closeEditProjectModalHandler}
                   type="edit"
                   project={project}
+                />
+              </Modal.Body>
+            </Modal>
+
+            <Modal
+              size="lg"
+              show={modalCreateTaskIsOpen}
+              onHide={closeCreateTaskModalHandler}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Crear Tarea</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <TaskForm
+                  closeModalHandler={closeCreateTaskModalHandler}
+                  type="create"
+                  projectId={project.id}
+                  taskReload={loadTask}
                 />
               </Modal.Body>
             </Modal>
@@ -277,35 +319,45 @@ const onDragEnd = (result, columns, setColumns) => {
                 </Accordion.Body>
               </Accordion.Item>
             </Accordion>
-            <br/>
-            <h1>Tareas</h1>
+            <br />
           </Container>
           <DragDropContext
-      onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
-    >
-      <Container>
-        <TaskColumnStyles>
-          {Object.entries(columns).map(([columnId, column], index) => {
-            return (
-              <Droppable key={columnId} droppableId={columnId}>
-                {(provided, snapshot) => (
-                  <TaskList
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <Title>{column.title}</Title>
-                    {column.items.map((item, index) => (
-                      <TaskCard key={item} item={item} index={index} />
-                    ))}
-                    {provided.placeholder}
-                  </TaskList>
-                )}
-              </Droppable>
-            );
-          })}
-        </TaskColumnStyles>
-      </Container>
-    </DragDropContext>
+            onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
+          >
+            <Container>
+              <h1>Tareas</h1>
+              <div className="createButton">
+                <Button onClick={openCreateTaskModalHandler} variant="primary">
+                  <FontAwesomeIcon icon={faPlusSquare} /> Crear Tarea
+                </Button>
+              </div>
+              <TaskColumnStyles>
+                {Object.entries(columns).map(([columnId, column], index) => {
+                  return (
+                    <Droppable key={columnId} droppableId={columnId}>
+                      {(provided, snapshot) => (
+                        <TaskList
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                        >
+                          <Title>{column.title}</Title>
+                          {column.items.map((item, index) => (
+                            <TaskCard
+                              key={item}
+                              item={item}
+                              index={index}
+                              taskReload={() => loadTask()}
+                            />
+                          ))}
+                          {provided.placeholder}
+                        </TaskList>
+                      )}
+                    </Droppable>
+                  );
+                })}
+              </TaskColumnStyles>
+            </Container>
+          </DragDropContext>
         </>
       )}
       {status == 0 && (

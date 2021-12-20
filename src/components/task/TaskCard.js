@@ -1,7 +1,11 @@
-import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
-import styled from '@emotion/styled';
-
+import React, { useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
+import styled from "@emotion/styled";
+import { Button, Modal } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
+import ProjectService from "../../service/ProjectService";
+import TaskForm from "../form/TaskForm";
 const TaskInformation = styled.div`
   display: flex;
   flex-direction: column;
@@ -25,35 +29,139 @@ const TaskInformation = styled.div`
   }
 `;
 
-const TaskCard = ({ item, index }) => {
-    console.log("TAREA LLEGO OK")
-    console.log(item)
-    return (
-      <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
-            <TaskInformation>
+const TaskCard = ({ item, index, taskReload }) => {
+  const [modalDeleteTask, setDeleteTaskModal] = useState({
+    is_open: false,
+    name: "",
+    id: -1,
+  });
+
+  const [modalEditTaskIsOpen, setEditTaskModalIsOpen] = useState(false);
+
+  const openEditTaskModalHandler = () => {
+    setEditTaskModalIsOpen(true);
+  };
+
+  const closeEditTaskModalHandler = () => {
+    setEditTaskModalIsOpen(false);
+  };
+
+  const openDeleteTaskModalHandler = (name, id) => {
+    setDeleteTaskModal({
+      is_open: true,
+      name: name,
+      id: id,
+    });
+  };
+
+  const closeDeleteTaskModalHandler = () => {
+    setDeleteTaskModal({
+      is_open: false,
+      name: "",
+      id: -1,
+    });
+  };
+
+  const deleteTask = (id) => {
+    ProjectService.deleteTask(id)
+      .then((res) => {
+        ProjectService.getTasks()
+          .then((res) => taskReload({ active: res.data, all: res.data }))
+          .catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
+
+    closeDeleteTaskModalHandler();
+  };
+
+  return (
+    <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <TaskInformation class="task-information">
+            <div onClick={openEditTaskModalHandler}>
               <p>{item.name}</p>
               <p>{item.description}</p>
-              <div className="secondary-details">
-                <p>
-                  <span>
-                    {new Date(item.start_date).toLocaleDateString('en-us', {
-                      month: 'short',
-                      day: '2-digit',
-                    })}
-                  </span>
-                </p>
+            </div>
+            <div className="secondary-details">
+              <p>
+                <span>
+                  {new Date(item.start_date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    timeZone: "UTC",
+                  })}
+                </span>
+              </p>
+              <div class="task-buttons">
+                <div>
+                  <Button
+                    variant="danger"
+                    onClick={() =>
+                      openDeleteTaskModalHandler(item.name, item.id)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </Button>
+                </div>
               </div>
-            </TaskInformation>
-          </div>
-        )}
-      </Draggable>
-    );
-  };
-  
-  export default TaskCard;
+            </div>
+          </TaskInformation>
+
+          <Modal
+            show={modalDeleteTask.is_open}
+            onHide={closeDeleteTaskModalHandler}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>{`Eliminar ${modalDeleteTask.name}`}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                <span>{`Desea realmente eliminar la tarea: ${modalDeleteTask.name}?`}</span>
+              </p>
+              <p>
+                <span>{`Recuerde que esta acción es irreversible`}</span>
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={closeDeleteTaskModalHandler} variant="secondary">
+                Close
+              </Button>
+              <Button
+                onClick={() => deleteTask(modalDeleteTask.id)}
+                variant="danger"
+              >
+                Eliminar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal
+            size="lg"
+            show={modalEditTaskIsOpen}
+            onHide={closeEditTaskModalHandler}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Editar Tarea</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <TaskForm
+                task={item}
+                closeModalHandler={closeEditTaskModalHandler}
+                type="edit"
+                projectId={item.project_id}
+                taskReload={taskReload}
+              />
+            </Modal.Body>
+          </Modal>
+        </div>
+      )}
+    </Draggable>
+  );
+};
+
+export default TaskCard;
