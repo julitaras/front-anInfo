@@ -14,7 +14,7 @@ export default function HourForm({
   defaultValues,
   edit = false,
 }) {
-  const [hour, setHour] = useState(defaultValues);
+  const [hour, setHour] = useState({...defaultValues, fecha:moment(defaultValues.fecha).format("YYYY-MM-DD")});
 
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -76,9 +76,9 @@ export default function HourForm({
           <Form.Group className="mb-3">
             <Form.Label>Fecha</Form.Label>
             <Form.Control
-			  required ="true"
+                required={true}
               type="date"
-              value={moment(hour.fecha).format("YYYY-MM-DD")}
+              value={hour.fecha}
               name="fecha"
               onChange={defaultHandler}
             />
@@ -87,11 +87,11 @@ export default function HourForm({
             <Form.Label>Projecto</Form.Label>
 
             <Form.Select
-			  required ="true"
-              value={hour.idProyecto}
+                required={true}
+              value={hour.idProyecto || ""}
               onChange={projectChangeHandler}
             >
-              <option selected disabled value={""}>Seleccione Projecto</option>
+              <option disabled value={""}>Seleccione Projecto</option>
               {projects.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
@@ -103,12 +103,12 @@ export default function HourForm({
             <Form.Label>Tarea</Form.Label>
 
             <Form.Select
-			  required ="true"
+                required={true}
               name="idTarea"
-              value={hour.idTarea}
+              value={hour.idTarea || ""}
               onChange={defaultHandler}
             >
-              <option selected disabled value={""}>Seleccione Tarea</option>
+              <option disabled value={""}>Seleccione Tarea</option>
               {availableTasks.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
@@ -119,7 +119,7 @@ export default function HourForm({
           <Form.Group className="mb-3">
             <Form.Label>Cantidad de horas</Form.Label>
             <Form.Control
-			  required ="true"
+                required={true}
               name="cantidadDeHoras"
               value={hour.cantidadDeHoras || ""}
               onChange={defaultHandler}
