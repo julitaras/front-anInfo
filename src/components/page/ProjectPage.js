@@ -187,8 +187,6 @@ const ProjectPage = (props) => {
     setCreateTaskModalIsOpen(false);
   };
 
-  const getEmployeeInformation = () => {};
-
   return (
     <Container>
       <Header {...props} />
