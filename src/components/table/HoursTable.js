@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Table } from "reactstrap";
+import { Table ,Row, Col} from "reactstrap";
 import { Button, ButtonGroup, Modal } from "react-bootstrap";
 import DatePicker from "sassy-datepicker";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 
 import HourService from "../../service/HourService";
 import HourForm from "../form/HourForm";
@@ -46,55 +47,59 @@ function HoursTable({ hours, setDate, date, updateHours }) {
   };
 
   const table = (
-    <div className="HoursTable" style={{ display: "block", padding: 30 }}>
-      <div className="container">
-        <div className="relative mt-2">
-          <button
-            className="px-2 py-1 bg-indigo-400 text-sm rounded-lg border-none text-white mr-2 outline-none focus:ring ring-indigo-100"
-            onClick={togglePicker}
-            type="button"
-          >
-            Choose Date
-          </button>
-          {visible ? (
-            <DatePicker
-              selected={new Date()}
-              onChange={handleDateSelect}
-              className="absolute mt-2"
-            />
-          ) : null}
-        </div>
-        <ButtonGroup aria-label="Basic example">
+    <div className="HoursTable">
+      <Row>
+        <Col xs="auto">
+          <ButtonGroup>
+            <button
+                variant="secondary"
+                onClick={togglePicker}
+            >
+              <FontAwesomeIcon icon={faCalendarAlt} />
+              Elegir Fecha
+            </button>
+            {visible ? (
+                <DatePicker
+                    selected={new Date()}
+                    onChange={handleDateSelect}
+                    className="absolute mt-2"
+                />
+            ) : null}
           <Button
-            variant="secondary"
-            onClick={() => setDate(moment(date).clone().subtract(1, "d"))}
+              variant="secondary"
+              onClick={() => setDate(moment(date).clone().subtract(1, "d"))}
           >
-            Left
+            IZQ
           </Button>
           <Button variant="secondary" disabled>
             {moment(date).format("YYYY-MM-DD")}
           </Button>
           <Button
-            variant="secondary"
-            onClick={() => setDate(moment(date).clone().add(1, "d"))}
+              variant="secondary"
+              onClick={() => setDate(moment(date).clone().add(1, "d"))}
           >
-            Right
+            DER
           </Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant= "success"onClick={openCreateModal}>
+                <FontAwesomeIcon icon={faPlusSquare} />
+                Cargar hora
+              </Button>
+            </div>
         </ButtonGroup>
-        <Button onClick={openCreateModal} style={{ marginLeft: 792 }}>
-          <FontAwesomeIcon icon={faPlusSquare} />
-          Cargar hora
-        </Button>
-      </div>
+        </Col>
+        <Col>
+      </Col>
+      </Row>
       <Table striped bordered hover>
         <thead>
           <tr>
-		    <th>Legajo</th>
-            <th>Proyecto</th>
-            <th>Tarea</th>
-            <th>Cantidad de Horas</th>
-            <th>Nota</th>
-            <th>Acciones</th>
+		    <th style={{width: "5%"}}>Legajo</th>
+            <th style={{width: "10%"}}>Proyecto</th>
+            <th style={{width: "10%"}}>Tarea</th>
+            <th style={{width: "10%"}}>Cantidad de Horas</th>
+            <th style={{width: "50%"}}>Nota</th>
+            <th style={{width: "10%"}}>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -117,8 +122,9 @@ function HoursTable({ hours, setDate, date, updateHours }) {
                   {hour.nota}
                 </td>
                 <td>
+                  <ButtonGroup>
                   <Button
-                    variant="secondary"
+                    variant="primary"
                     name={hour.id}
                     onClick={editButtonHandler}
                     style={{ margin: 1 }}
@@ -127,12 +133,13 @@ function HoursTable({ hours, setDate, date, updateHours }) {
                   </Button>
                   <Button
                     name={hour.id}
-                    variant="secondary"
+                    variant="danger"
                     onClick={deleteButtonHandler}
                     style={{ margin: 1 }}
                   >
                     Eliminar
                   </Button>
+                    </ButtonGroup>
                 </td>
               </tr>
             </React.Fragment>
