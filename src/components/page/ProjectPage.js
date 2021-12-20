@@ -220,7 +220,7 @@ const ProjectPage = (props) => {
   };
 
   return (
-    <Container>
+    <Container >
       <Header {...props} />
       <Breadcrumbs {...props} />
       {project && status == 200 && (
@@ -263,7 +263,7 @@ const ProjectPage = (props) => {
               </Modal.Body>
             </Modal>
 
-            <Accordion defaultActiveKey="0">
+            <Accordion defaultActiveKey="0" className="sombrita">
               <Accordion.Item eventKey="0">
                 <Accordion.Header>
                   Información sobre {project?.name}
@@ -359,6 +359,7 @@ const ProjectPage = (props) => {
                   <Button
                     onClick={openEditProjectModalHandler}
                     variant="primary"
+                    className="sombrita"
                   >
                     <FontAwesomeIcon icon={faEdit} /> Editar Proyecto
                   </Button>
@@ -373,7 +374,7 @@ const ProjectPage = (props) => {
             <Container>
               <h1>Tareas</h1>
               <div className="createButton">
-                <Button onClick={openCreateTaskModalHandler} variant="primary">
+                <Button onClick={openCreateTaskModalHandler} variant="primary" className="sombrita" >
                   <FontAwesomeIcon icon={faPlusSquare} /> Crear Tarea
                 </Button>
               </div>
@@ -382,7 +383,7 @@ const ProjectPage = (props) => {
                   return (
                     <Droppable key={columnId} droppableId={columnId}>
                       {(provided, snapshot) => (
-                        <TaskList
+                        <TaskList className="sombrita"
                           ref={provided.innerRef}
                           {...provided.droppableProps}
                         >

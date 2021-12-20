@@ -85,7 +85,7 @@ const TaskCard = ({ item, index, taskReload }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <TaskInformation class="task-information">
+          <TaskInformation className="sombrita">
             <div onClick={openEditTaskModalHandler}>
               <p>{item.name}</p>
               <p>{item.description}</p>
@@ -134,12 +134,13 @@ const TaskCard = ({ item, index, taskReload }) => {
               </p>
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={closeDeleteTaskModalHandler} variant="secondary">
+              <Button onClick={closeDeleteTaskModalHandler} variant="secondary" className="sombrita">
                 Close
               </Button>
               <Button
                 onClick={() => deleteTask(modalDeleteTask.id)}
                 variant="danger"
+                className="sombrita"
               >
                 Eliminar
               </Button>

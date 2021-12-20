@@ -52,17 +52,17 @@
   padding-bottom: 1ch;
 }
 
-.createButton{
+.createButton {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.task-buttons{
+.task-buttons {
   display: flex;
   justify-content: space-between;
 }
 
-.task-information {
+.sombrita {
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }

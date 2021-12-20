@@ -86,7 +86,7 @@ const ProjectPage = (props) => {
 
   return (
     <>
-      <Header {...props} />
+      <Header {...props}  />
       <Breadcrumbs {...props} />
 
       <Container>
@@ -102,7 +102,7 @@ const ProjectPage = (props) => {
               onChange={searchHandler}
             />
           </div>
-          <Button onClick={openCreateProjectModalHandler} variant="primary">
+          <Button onClick={openCreateProjectModalHandler} variant="primary" className="sombrita">
             <FontAwesomeIcon icon={faPlusSquare} /> Crear proyecto
           </Button>
         </aside>
@@ -143,12 +143,14 @@ const ProjectPage = (props) => {
             <Button
               onClick={closeDeleteProjectModalHandler}
               variant="secondary"
+              className="sombrita"
             >
               Close
             </Button>
             <Button
               onClick={() => deleteProject(modalDeleteProject.id)}
               variant="danger"
+              className="sombrita"
             >
               Eliminar
             </Button>
@@ -192,11 +194,12 @@ const ProjectPage = (props) => {
                   </div>
                 </Card.Text>
                 <div className="project-card-buttons">
-                  <Button href={`/projects/${project.id}`} variant="primary">
+                  <Button href={`/projects/${project.id}`} variant="primary" className="sombrita">
                     <FontAwesomeIcon icon={faEye} /> Ver Proyecto
                   </Button>
                   <Button
                     variant="danger"
+                    className="sombrita"
                     onClick={() =>
                       openDeleteProjectModalHandler(project.name, project.id)
                     }

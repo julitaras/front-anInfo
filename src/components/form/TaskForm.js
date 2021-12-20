@@ -170,7 +170,7 @@ const TaskForm = (props) => {
             <span className="form-required">*</span>Campos obligatorios
           </p>
           <Modal.Footer>
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" className="sombrita">
               {type == "crear" ? "Crear Tarea" : "Guardar Tarea"}
             </Button>
           </Modal.Footer>
