@@ -58,7 +58,10 @@ class ProjectService {
           name: values.name,
           description: values.description,
           leader: values.leader,
-          members: values.members.map((member) => member.value.toString()),
+          members:
+            values.members != []
+              ? values.members.map((member) => member.value.toString())
+              : [],
           state: values.state,
           start_date: new Date(values.start_date),
           finish_date: new Date(values.finish_date),

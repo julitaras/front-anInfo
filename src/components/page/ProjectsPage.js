@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import Header from "../Header";
 import { compose } from "redux";
 import withParams from "../../hoc/withParams";
@@ -21,7 +21,6 @@ import { Container, Card, Button, Modal } from "react-bootstrap";
 import { Input, Label } from "reactstrap";
 import Breadcrumbs from "../Breadcrumbs";
 import ProjectForm from "../form/ProjectForm";
-
 
 const ProjectPage = (props) => {
   useLayoutEffect(() => {
@@ -158,7 +157,12 @@ const ProjectPage = (props) => {
       </Container>
 
       <Container>
-        {projects?.active?.length < 1 && <p>No hay proyectos aun...</p>}
+        {!projects.active && (
+          <div className="d-flex flex-column align-items-center justify-content-center">
+            <h1>No hay proyectos aun...</h1>
+          </div>
+        )}
+        {projects?.total?.length < 1 && <p>No hay proyectos aun...</p>}
         {projects?.active?.length > 0 &&
           projects?.active?.map((project) => (
             <Card className="project-card" key={project.id}>
