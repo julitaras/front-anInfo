@@ -20,7 +20,8 @@ const initialValue = {
 };
 
 const ProjectForm = (props) => {
-  const { closeModalHandler, setProjects, type, project } = props;
+  const { closeModalHandler, setProjects, type, project, projectEmployees } =
+    props;
   const [employees, setEmployees] = useState([]);
   const [employeesOptions, setEmployeesOptions] = useState([]);
 
@@ -38,6 +39,7 @@ const ProjectForm = (props) => {
       ? initialValue
       : {
           ...project,
+          members: projectEmployees ? projectEmployees : [],
           start_date: new Date(project.start_date).toLocaleDateString("fr-CA"),
           finish_date: new Date(project.finish_date).toLocaleDateString(
             "fr-CA"

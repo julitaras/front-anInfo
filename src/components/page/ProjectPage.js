@@ -218,6 +218,7 @@ const ProjectPage = (props) => {
                   closeModalHandler={closeEditProjectModalHandler}
                   type="edit"
                   project={project}
+                  projectEmployees={employees}
                 />
               </Modal.Body>
             </Modal>
