@@ -11,6 +11,7 @@ import ClientService from "../../service/ClientService";
 import EditTicketForm from "../form/EditTicketForm";
 import {Form, FormGroup, Input, Label} from "reactstrap";
 import ProjectService from "../../service/ProjectService";
+import EmployeeService from "../../service/EmployeeService";
 
 class TicketPage extends Component {
 
@@ -24,7 +25,8 @@ class TicketPage extends Component {
             taskModalIsOpen: false,
             projects: [],
             taskID: undefined,
-            tasks: []
+            tasks: [],
+            employees: []
         };
         this.closeEditModal = this.closeEditModal.bind(this);
         this.openEditModal = this.openEditModal.bind(this);
@@ -67,7 +69,13 @@ class TicketPage extends Component {
                     projects: response.data
                 })
         })
-        
+        const employeeService = new EmployeeService();
+        employeeService.getEmployees().then(response => {
+            this.setState(
+                {
+                    employees: response.data
+                })
+        });
     }
 
     getClientName() {
@@ -139,6 +147,13 @@ class TicketPage extends Component {
             });
         });
     }
+
+    employeeFullName(employeeID) {
+        let employee = this.state.employees.filter((employee) => {
+             return employee.legajo === employeeID;
+         })[0];
+         return (employee === undefined ? undefined : `${employee.Nombre} ${employee.Apellido} `);
+     }
 
     deleteTicket() {
         
@@ -301,7 +316,7 @@ class TicketPage extends Component {
                             <strong>Fecha de creación:  </strong>{this.state.data.createdDate}
                         </Col>
                         <Col>
-                            <strong>Responsable:  </strong>{this.state.data.employeeID}
+                            <strong>Responsable:  </strong>{this.employeeFullName(this.state.data.employeeID)}
                         </Col>
                     </Row>
                     <Row>
